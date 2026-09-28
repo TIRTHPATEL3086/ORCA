@@ -29,6 +29,13 @@ class Settings(BaseSettings):
     otp_expire_minutes: int = 5
     otp_resend_cooldown_seconds: int = 60
 
+    # OTP delivery: "dev" (show code in app) or "sms_gate" (real SMS
+    # via SMS Gateway for Android). See app/services/sms_service.py.
+    otp_provider: str = "dev"
+    sms_gate_url: str = "https://api.sms-gate.app/3rdparty/v1"
+    sms_gate_username: str | None = None
+    sms_gate_password: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
         env_file_encoding="utf-8",

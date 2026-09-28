@@ -60,7 +60,7 @@ class OrcaAgentService {
               'cruising_speed_knots': cruisingSpeedKnots,
             }),
           )
-          .timeout(const Duration(seconds: 45));
+          .timeout(const Duration(seconds: 90));
 
       dynamic decoded;
 

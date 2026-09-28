@@ -19,10 +19,18 @@ services:
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "30"
-      # "development" shows the OTP in the app because no SMS provider is
-      # connected yet. Switch to "production" once SMS delivery is added.
       - key: APP_ENV
-        value: development
+        value: production
+      # "dev" shows the OTP in the app (testing only). "sms_gate" sends a
+      # real SMS through SMS Gateway for Android and never shows the code.
+      - key: OTP_PROVIDER
+        value: dev
+      # Credentials from the SMS Gateway app (Cloud Server section).
+      # Set these in the Render dashboard; they are not stored in git.
+      - key: SMS_GATE_USERNAME
+        sync: false
+      - key: SMS_GATE_PASSWORD
+        sync: false
       - key: OTP_EXPIRE_MINUTES
         value: "5"
       - key: OTP_RESEND_COOLDOWN_SECONDS

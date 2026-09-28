@@ -35,7 +35,7 @@ class AuthService {
           headers: _headers,
           body: jsonEncode({'phone_number': phoneNumber.trim()}),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(ApiConfig.requestTimeout);
 
     return OtpRequestResult.fromJson(_decode(response));
   }
@@ -53,7 +53,7 @@ class AuthService {
             'otp': otp.trim(),
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(ApiConfig.requestTimeout);
 
     return OtpVerifyResult.fromJson(_decode(response));
   }
@@ -79,7 +79,7 @@ class AuthService {
             'emergency_contact_phone': _nullable(emergencyContactPhone),
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(ApiConfig.requestTimeout);
 
     return AuthResult.fromJson(_decode(response));
   }
@@ -102,7 +102,7 @@ class AuthService {
             'preferred_language': preferredLanguage,
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(ApiConfig.requestTimeout);
 
     return AuthenticatedUser.fromJson(_decode(response));
   }
@@ -120,7 +120,7 @@ class AuthService {
             'password': password,
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(ApiConfig.requestTimeout);
 
     return AuthResult.fromJson(_decode(response));
   }

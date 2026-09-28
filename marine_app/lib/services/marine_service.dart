@@ -44,7 +44,7 @@ class MarineService {
               'Authorization': 'Bearer $token',
             },
           )
-          .timeout(const Duration(seconds: 20));
+          .timeout(ApiConfig.requestTimeout);
 
       Map<String, dynamic> body = {};
 

@@ -57,7 +57,7 @@ class FishermanService {
     return _network(() async {
       final response = await http
           .get(Uri.parse('$_baseUrl/profile'), headers: await _headers())
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       return FishermanProfileData.fromJson(_decode(response));
     });
@@ -83,7 +83,7 @@ class FishermanService {
               'emergency_contact_phone': _nullable(emergencyContactPhone),
             }),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       final result = FishermanProfileData.fromJson(_decode(response));
 
@@ -97,7 +97,7 @@ class FishermanService {
     return _network(() async {
       final response = await http
           .get(Uri.parse('$_baseUrl/vessels'), headers: await _headers())
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       final decoded = _decodeDynamic(response);
 
@@ -139,7 +139,7 @@ class FishermanService {
               'persons_onboard_default': personsOnboardDefault,
             }),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       return VesselData.fromJson(_decode(response));
     });
@@ -170,7 +170,7 @@ class FishermanService {
               'persons_onboard_default': personsOnboardDefault,
             }),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       return VesselData.fromJson(_decode(response));
     });
@@ -183,7 +183,7 @@ class FishermanService {
             Uri.parse('$_baseUrl/vessels/$vesselId'),
             headers: await _headers(),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       if (response.statusCode != 204) {
         _throwForResponse(response);

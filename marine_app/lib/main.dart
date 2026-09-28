@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'core/api_config.dart';
 import 'core/responsive.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/profile/fisherman_profile_screen.dart';
@@ -7,6 +8,7 @@ import 'screens/session_bootstrap_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  ApiConfig.warmUp();
   runApp(const OrcaApp());
 }
 

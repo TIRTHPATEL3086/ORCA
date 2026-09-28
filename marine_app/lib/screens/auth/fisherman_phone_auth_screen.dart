@@ -202,6 +202,23 @@ class _FishermanPhoneAuthScreenState extends State<FishermanPhoneAuthScreen> {
                         )
                       : const Text('Send OTP'),
                 ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  child: isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: Text(
+                            'Connecting to ORCA… the first request can take '
+                            'up to a minute.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppTheme.muted,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(width: double.infinity),
+                ),
               ],
             ),
           ),

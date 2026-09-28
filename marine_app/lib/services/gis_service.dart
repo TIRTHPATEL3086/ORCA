@@ -58,7 +58,7 @@ class GisService {
     return _network(() async {
       final response = await http
           .get(Uri.parse('$_baseUrl/zones'), headers: await _headers())
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       final decoded = _decodeDynamic(response);
 
@@ -90,7 +90,7 @@ class GisService {
 
       final response = await http
           .get(uri, headers: await _headers())
-          .timeout(const Duration(seconds: 15));
+          .timeout(ApiConfig.requestTimeout);
 
       return BoundaryCheckData.fromJson(_decodeMap(response));
     });
@@ -116,7 +116,7 @@ class GisService {
               'cruising_speed_knots': cruisingSpeedKnots,
             }),
           )
-          .timeout(const Duration(seconds: 40));
+          .timeout(ApiConfig.requestTimeout);
 
       return RoutePlanData.fromJson(_decodeMap(response));
     });

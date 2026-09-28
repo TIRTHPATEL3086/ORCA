@@ -39,6 +39,7 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.api.dependencies import get_current_user
+from app.services.sms_service import SmsDeliveryError, send_otp_sms, sends_real_sms
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -258,19 +259,26 @@ def request_fisherman_otp(
     )
 
     db.add(challenge)
+
+    # Send before committing so a failed SMS leaves no unusable challenge.
+    try:
+        send_otp_sms(phone_number, otp)
+    except SmsDeliveryError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Could not send the OTP SMS right now. Please try again shortly.",
+        )
+
     db.commit()
 
-    # DEVELOPMENT ONLY.
-    # Later this gets replaced by an SMS provider.
-    development_otp = (
-        otp
-        if settings.app_env.lower()
-        == "development"
-        else None
-    )
+    # Only in "dev" OTP mode is the code returned to the app for testing.
+    development_otp = None if sends_real_sms() else otp
 
     return OTPRequestResponse(
-        message="OTP generated successfully.",
+        message=(
+            "OTP sent by SMS." if sends_real_sms() else "OTP generated successfully."
+        ),
         expires_in_seconds=(
             settings.otp_expire_minutes * 60
         ),
