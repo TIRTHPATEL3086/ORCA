@@ -248,12 +248,17 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const Text(
-                'Only add what you know',
-                style: TextStyle(
-                  color: AppTheme.coralDeep,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
+              const SizedBox(width: 12),
+              const Flexible(
+                child: Text(
+                  'Only add what you know',
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppTheme.coralDeep,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

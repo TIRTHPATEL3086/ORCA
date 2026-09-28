@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'core/responsive.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/profile/fisherman_profile_screen.dart';
 import 'screens/session_bootstrap_screen.dart';
@@ -18,6 +19,7 @@ class OrcaApp extends StatelessWidget {
       title: 'ORCA',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      builder: Responsive.appBuilder,
       home: const SessionBootstrapScreen(),
       routes: {'/fisherman/profile': (_) => const FishermanProfileScreen()},
     );

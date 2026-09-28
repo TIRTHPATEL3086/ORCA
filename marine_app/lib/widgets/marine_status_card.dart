@@ -38,13 +38,16 @@ class MarineStatusCard extends StatelessWidget {
                         children: [
                           CircleAvatar(radius: 4, backgroundColor: AppTheme.lime),
                           SizedBox(width: 7),
-                          Text(
-                            'MARINE STATUS',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
+                          Flexible(
+                            child: Text(
+                              'MARINE STATUS',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                              ),
                             ),
                           ),
                         ],
@@ -124,15 +127,21 @@ class MarineStatusCard extends StatelessWidget {
           children: [
             Icon(icon, color: AppTheme.coralDeep, size: 20),
             const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(
-                color: AppTheme.ink,
-                fontWeight: FontWeight.w800,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                maxLines: 1,
+                style: const TextStyle(
+                  color: AppTheme.ink,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: AppTheme.muted, fontSize: 10.5),
             ),
           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/responsive.dart';
 import '../core/theme/app_theme.dart';
 import '../widgets/orca_mascot.dart';
 import '../widgets/talkie_ui.dart';
@@ -50,6 +51,39 @@ class _LanguageScreenState extends State<LanguageScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _header(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Text(
+                'Choose your\nlanguage',
+                style: TextStyle(
+                  fontSize: context.rs(30),
+                  height: 1.08,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.9,
+                  color: AppTheme.ink,
+                ),
+              ),
+            ),
+            const OrcaMascot(size: 78, mood: MascotMood.sparkle),
+          ],
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Choose the language you understand best. '
+          'ORCA will use it across guidance, alerts '
+          'and marine information.',
+          style: TextStyle(color: AppTheme.muted, fontSize: 14, height: 1.5),
+        ),
+      ],
     );
   }
 
@@ -115,49 +149,16 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 18),
-
-                      const Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Choose your\nlanguage',
-                              style: TextStyle(
-                                fontSize: 30,
-                                height: 1.08,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.9,
-                                color: AppTheme.ink,
-                              ),
-                            ),
-                          ),
-                          OrcaMascot(size: 78, mood: MascotMood.sparkle),
-                        ],
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      const Text(
-                        'Choose the language you understand best. '
-                        'ORCA will use it across guidance, alerts '
-                        'and marine information.',
-                        style: TextStyle(
-                          color: AppTheme.muted,
-                          fontSize: 14,
-                          height: 1.5,
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
                       Expanded(
                         child: ListView.separated(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          itemCount: languages.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 8),
+                          padding: const EdgeInsets.only(top: 18, bottom: 8),
+                          itemCount: languages.length + 1,
+                          separatorBuilder: (_, index) =>
+                              SizedBox(height: index == 0 ? 18 : 8),
                           itemBuilder: (context, index) {
-                            final language = languages[index];
+                            if (index == 0) return _header(context);
+
+                            final language = languages[index - 1];
 
                             final isSelected =
                                 selectedLanguage == language.name;
@@ -214,7 +215,12 @@ class _LanguageScreenState extends State<LanguageScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Continue in $selectedLanguage'),
+                            Flexible(
+                              child: Text(
+                                'Continue in $selectedLanguage',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                             const SizedBox(width: 10),
                             const Icon(Icons.arrow_forward_rounded, size: 20),
                           ],

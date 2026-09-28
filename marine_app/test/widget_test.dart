@@ -1,24 +1,29 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:marine_app/main.dart';
+import 'package:marine_app/core/responsive.dart';
+import 'package:marine_app/core/theme/app_theme.dart';
+import 'package:marine_app/screens/splash_screen.dart';
 
 void main() {
-  testWidgets('ORCA splash screen opens and navigates to language selection', (
+  testWidgets('ORCA splash screen opens and navigates to the landing page', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const OrcaApp());
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.lightTheme,
+        builder: Responsive.appBuilder,
+        home: const SplashScreen(),
+      ),
+    );
 
     expect(find.text('ORCA'), findsOneWidget);
-
-    expect(find.text('Marine Intelligence Platform'), findsOneWidget);
-
+    expect(find.text('MARINE INTELLIGENCE'), findsOneWidget);
     expect(find.text('Intelligence that travels with you.'), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 1));
 
-    await tester.pumpAndSettle();
-
-    expect(find.text('Choose Language'), findsOneWidget);
-
-    expect(find.text('Select your preferred language'), findsOneWidget);
+    expect(find.text("Let's start"), findsOneWidget);
+    expect(find.text('How ORCA works'), findsOneWidget);
   });
 }

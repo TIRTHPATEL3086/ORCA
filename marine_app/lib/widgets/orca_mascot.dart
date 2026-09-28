@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../core/responsive.dart';
 import '../core/theme/app_theme.dart';
 
 enum MascotMood { happy, sparkle, sleepy, calm }
@@ -24,9 +25,12 @@ class OrcaMascot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Small avatar-sized mascots keep their size; artwork scales with the screen.
+    final s = size <= 48 ? size : size * Responsive.artScale(context);
+
     return SizedBox(
-      width: size,
-      height: size,
+      width: s,
+      height: s,
       child: CustomPaint(painter: _MascotPainter(mood, color, halo)),
     );
   }

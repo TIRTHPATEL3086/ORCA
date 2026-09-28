@@ -201,12 +201,15 @@ class _FishermanRegistrationScreenState
                         size: 16,
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        'Phone verified: ${widget.phoneNumber}',
-                        style: const TextStyle(
-                          color: AppTheme.ink,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          'Phone verified: ${widget.phoneNumber}',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppTheme.ink,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
