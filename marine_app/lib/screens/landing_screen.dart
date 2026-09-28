@@ -104,7 +104,6 @@ class _LandingScreenState extends State<LandingScreen>
             SliverToBoxAdapter(child: _habitat(g)),
             SliverToBoxAdapter(child: _roles(g)),
             SliverToBoxAdapter(child: _trust(g)),
-            SliverToBoxAdapter(child: _stack(g)),
             SliverToBoxAdapter(child: _steps(g)),
             SliverToBoxAdapter(child: _finalCta(g)),
             SliverToBoxAdapter(child: _footer(g)),
@@ -318,7 +317,6 @@ class _LandingScreenState extends State<LandingScreen>
       (Icons.terrain_rounded, 'GEBCO bathymetry'),
       (Icons.biotech_outlined, 'CMLRE specimen records'),
       (Icons.gavel_rounded, 'Maritime zones · 12 nm & EEZ'),
-      (Icons.storage_rounded, 'PostGIS spatial engine'),
     ];
 
     return Padding(
@@ -804,75 +802,7 @@ class _LandingScreenState extends State<LandingScreen>
     );
   }
 
-  // ── 11. Technology ───────────────────────────────────────────────────────
-  Widget _stack(double g) {
-    const stack = [
-      (Icons.phone_android_rounded, 'Flutter', 'Mobile app'),
-      (Icons.bolt_rounded, 'FastAPI', 'Python backend'),
-      (Icons.storage_rounded, 'PostgreSQL + PostGIS', 'Spatial database'),
-      (Icons.model_training_rounded, 'scikit-learn', 'Habitat model'),
-      (Icons.lock_outline_rounded, 'JWT + Argon2', 'Secure sign-in'),
-      (Icons.sms_outlined, 'Phone OTP', 'Fisherman access'),
-    ];
-
-    return _Section(
-      gutter: g,
-      eyebrow: 'UNDER THE HOOD',
-      title: 'Production-grade, open technology.',
-      subtitle:
-          'A modern mobile client backed by a spatial database, a Python API '
-          'and reproducible machine-learning pipelines.',
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final w = (c.maxWidth - 10) / 2;
-          return Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              for (final (i, (icon, name, role)) in stack.indexed)
-                SizedBox(
-                  width: w,
-                  child: Reveal(
-                    delay: Duration(milliseconds: 60 * (i % 2)),
-                    child: Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(icon, size: 22, color: AppTheme.coralDeep),
-                          const SizedBox(height: 10),
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            role,
-                            style: const TextStyle(
-                              color: AppTheme.muted,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  // ── 12. Steps ────────────────────────────────────────────────────────────
+  // ── 11. Steps ─────────────────────────────────────────────────────────────
   Widget _steps(double g) {
     const steps = [
       ('Choose your language', 'Pick from 10 Indian languages. Voice follows it.'),
@@ -950,7 +880,7 @@ class _LandingScreenState extends State<LandingScreen>
     );
   }
 
-  // ── 13. Final call to action ─────────────────────────────────────────────
+  // ── 12. Final call to action ─────────────────────────────────────────────
   Widget _finalCta(double g) {
     return Padding(
       padding: EdgeInsets.fromLTRB(g - 6, 8, g - 6, 0),
