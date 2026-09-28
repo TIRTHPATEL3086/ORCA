@@ -4,6 +4,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../core/theme/app_theme.dart';
 import '../data/orca_guide_content.dart';
 import '../data/orca_languages.dart';
+import '../widgets/orca_mascot.dart';
+import '../widgets/talkie_ui.dart';
 
 class OnboardingGuideScreen extends StatefulWidget {
   final String initialLanguageCode;
@@ -105,113 +107,112 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F7F9),
-      body: Stack(
-        children: [
-          const _GuideBackground(),
-          SafeArea(
-            child: Column(
-              children: [
-                _topBar(context),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          child: Column(
-                            key: ValueKey(selectedLanguageCode),
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                pack.pageTitle,
-                                style: const TextStyle(
-                                  color: AppTheme.navy,
-                                  fontSize: 31,
-                                  fontWeight: FontWeight.w800,
-                                ),
+      body: GridBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              _topBar(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: Column(
+                          key: ValueKey(selectedLanguageCode),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              pack.pageTitle,
+                              style: const TextStyle(
+                                color: AppTheme.ink,
+                                fontSize: 30,
+                                height: 1.1,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.9,
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                pack.pageSubtitle,
-                                style: const TextStyle(
-                                  color: Color(0xFF647A85),
-                                  fontSize: 14.5,
-                                  height: 1.45,
-                                ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              pack.pageSubtitle,
+                              style: const TextStyle(
+                                color: AppTheme.muted,
+                                fontSize: 14.5,
+                                height: 1.5,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 22),
-                        _languageSelector(),
-                        const SizedBox(height: 24),
-                        Text(
-                          pack.chooseGuide,
-                          style: const TextStyle(
-                            color: AppTheme.navy,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                          ),
+                      ),
+                      const SizedBox(height: 22),
+                      _languageSelector(),
+                      const SizedBox(height: 24),
+                      Text(
+                        pack.chooseGuide,
+                        style: const TextStyle(
+                          color: AppTheme.ink,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3,
                         ),
-                        const SizedBox(height: 12),
-                        _roleSelector(),
-                        const SizedBox(height: 26),
-                        _roleOverview(),
-                        const SizedBox(height: 20),
-                        _currentStepCard(),
-                        const SizedBox(height: 20),
-                        _stepIndicators(),
-                        const SizedBox(height: 24),
-                        _navigationButtons(),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 12),
+                      _roleSelector(),
+                      const SizedBox(height: 26),
+                      _roleOverview(),
+                      const SizedBox(height: 20),
+                      _currentStepCard(),
+                      const SizedBox(height: 20),
+                      _stepIndicators(),
+                      const SizedBox(height: 24),
+                      _navigationButtons(),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _topBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 6),
       child: Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.92),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_rounded),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: PillProgress(
+              value: (currentStep + 1) / selectedGuide.steps.length,
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 12),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: AppTheme.oceanBlue.withValues(alpha: 0.08),
+              color: AppTheme.coralSoft,
               borderRadius: BorderRadius.circular(30),
             ),
             child: const Row(
               children: [
                 Icon(
                   Icons.auto_awesome_rounded,
-                  size: 16,
-                  color: AppTheme.oceanBlue,
+                  size: 15,
+                  color: AppTheme.coralDeep,
                 ),
-                SizedBox(width: 6),
+                SizedBox(width: 5),
                 Text(
                   'ORCA GUIDE',
                   style: TextStyle(
-                    color: AppTheme.oceanBlue,
+                    color: AppTheme.coralDeep,
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.8,
@@ -227,31 +228,18 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
 
   Widget _languageSelector() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(12, 10, 16, 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFDCE8EC)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.035),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.oceanBlue, AppTheme.cyan],
-              ),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.language_rounded, color: Colors.white),
+          const SoftIcon(
+            Icons.language_rounded,
+            color: AppTheme.indigo,
+            background: AppTheme.lavenderSoft,
+            size: 46,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -266,8 +254,8 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                     child: Text(
                       '${language.nativeName} • ${language.name}',
                       style: const TextStyle(
-                        color: AppTheme.navy,
-                        fontWeight: FontWeight.w700,
+                        color: AppTheme.ink,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   );
@@ -301,36 +289,19 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
               width: 132,
               padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
-                gradient: selected
-                    ? const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [AppTheme.oceanBlue, AppTheme.cyan],
-                      )
-                    : null,
-                color: selected ? null : Colors.white,
+                color: selected ? AppTheme.coral : Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: selected
-                      ? Colors.transparent
-                      : const Color(0xFFDCE8EC),
-                ),
-                boxShadow: [
-                  if (selected)
-                    BoxShadow(
-                      color: AppTheme.oceanBlue.withValues(alpha: 0.16),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  SoftIcon(
                     guide.icon,
-                    color: selected ? Colors.white : AppTheme.oceanBlue,
-                    size: 27,
+                    color: selected ? Colors.white : AppTheme.coralDeep,
+                    background: selected
+                        ? Colors.white.withValues(alpha: 0.22)
+                        : AppTheme.coralSoft,
+                    size: 40,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -339,7 +310,7 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: selected ? Colors.white : AppTheme.navy,
+                      color: selected ? Colors.white : AppTheme.ink,
                       fontSize: 11.5,
                       height: 1.12,
                       fontWeight: FontWeight.w700,
@@ -362,23 +333,16 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF061B2C), Color(0xFF0A566D)],
-          ),
-          borderRadius: BorderRadius.circular(26),
+          color: AppTheme.lavenderSoft,
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         ),
         child: Row(
           children: [
-            Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Icon(selectedGuide.icon, color: Colors.white, size: 30),
+            SoftIcon(
+              selectedGuide.icon,
+              color: AppTheme.indigo,
+              background: Colors.white,
+              size: 56,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -388,16 +352,17 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                   Text(
                     selectedGuide.title,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.ink,
                       fontSize: 19,
                       fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     selectedGuide.subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.72),
+                    style: const TextStyle(
+                      color: AppTheme.muted,
                       fontSize: 12.5,
                       height: 1.4,
                     ),
@@ -405,6 +370,8 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
+            const OrcaMascot(size: 58, mood: MascotMood.calm),
           ],
         ),
       ),
@@ -422,31 +389,18 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: const Color(0xFFDCE8EC)),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.oceanBlue.withValues(alpha: 0.07),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Container(
-                  width: 58,
-                  height: 58,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppTheme.oceanBlue, AppTheme.cyan],
-                    ),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Icon(selectedStep.icon, color: Colors.white, size: 29),
+                SoftIcon(
+                  selectedStep.icon,
+                  color: AppTheme.coralDeep,
+                  background: AppTheme.coralSoft,
+                  size: 52,
                 ),
                 const Spacer(),
                 Container(
@@ -455,13 +409,13 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF6F7),
+                    color: AppTheme.limeSoft,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '${pack.stepLabel} ${currentStep + 1}',
                     style: const TextStyle(
-                      color: AppTheme.oceanBlue,
+                      color: AppTheme.ink,
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                     ),
@@ -469,20 +423,30 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 8),
+            Center(
+              child: OrcaMascot(
+                size: 110,
+                mood: MascotMood.values[currentStep % MascotMood.values.length],
+                halo: true,
+              ),
+            ),
+            const SizedBox(height: 14),
             Text(
               selectedStep.title,
               style: const TextStyle(
-                color: AppTheme.navy,
-                fontSize: 23,
+                color: AppTheme.ink,
+                fontSize: 26,
+                height: 1.15,
                 fontWeight: FontWeight.w800,
+                letterSpacing: -0.8,
               ),
             ),
             const SizedBox(height: 10),
             Text(
               selectedStep.description,
               style: const TextStyle(
-                color: Color(0xFF617783),
+                color: AppTheme.muted,
                 fontSize: 14.5,
                 height: 1.55,
               ),
@@ -504,11 +468,9 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                       : '${pack.listen} • ${currentLanguage.nativeName}',
                 ),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.oceanBlue,
-                  side: const BorderSide(color: Color(0xFFB8D8E0)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  foregroundColor: AppTheme.coralDeep,
+                  backgroundColor: AppTheme.coralSoft,
+                  side: BorderSide.none,
                 ),
               ),
             ),
@@ -529,7 +491,7 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
           width: selected ? 28 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: selected ? AppTheme.oceanBlue : const Color(0xFFC7D6DC),
+            color: selected ? AppTheme.coral : Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
         );
@@ -559,7 +521,7 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
           flex: 2,
           child: SizedBox(
             height: 54,
-            child: FilledButton(
+            child: ElevatedButton(
               onPressed: () {
                 _stopSpeaking();
                 if (currentStep < selectedGuide.steps.length - 1) {
@@ -568,60 +530,15 @@ class _OnboardingGuideScreenState extends State<OnboardingGuideScreen> {
                   Navigator.pop(context);
                 }
               },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.navy,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(17),
-                ),
-              ),
               child: Text(
                 currentStep == selectedGuide.steps.length - 1
                     ? pack.finishGuide
                     : pack.nextStep,
-                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _GuideBackground extends StatelessWidget {
-  const _GuideBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Stack(
-        children: [
-          Positioned(
-            top: -120,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.cyan.withValues(alpha: 0.06),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -150,
-            left: -120,
-            child: Container(
-              width: 350,
-              height: 350,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.oceanBlue.withValues(alpha: 0.05),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

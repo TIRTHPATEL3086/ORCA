@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 import 'fisherman_otp_screen.dart';
 
 class FishermanPhoneAuthScreen extends StatefulWidget {
@@ -69,109 +71,126 @@ class _FishermanPhoneAuthScreenState extends State<FishermanPhoneAuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F8FA),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                onPressed: isLoading ? null : () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_rounded),
-              ),
-              const SizedBox(height: 34),
-              Container(
-                width: 74,
-                height: 74,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.oceanBlue, AppTheme.cyan],
-                  ),
-                  borderRadius: BorderRadius.circular(23),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.oceanBlue.withValues(alpha: 0.18),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
+      body: GridBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed:
+                          isLoading ? null : () => Navigator.pop(context),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 20,
+                      ),
                     ),
+                    const SizedBox(width: 6),
+                    const Expanded(child: PillProgress(value: 0.33)),
+                    const SizedBox(width: 12),
                   ],
                 ),
-                child: const Icon(
-                  Icons.phishing_rounded,
-                  color: Colors.white,
-                  size: 38,
+                const SizedBox(height: 18),
+                const Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      OrcaMascot(size: 120, mood: MascotMood.happy, halo: true),
+                      Positioned(
+                        right: -6,
+                        bottom: 6,
+                        child: SoftIcon(
+                          Icons.phishing_rounded,
+                          color: AppTheme.coralDeep,
+                          background: AppTheme.coralSoft,
+                          size: 44,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              const Text(
-                'Fisherman Access',
-                style: TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 34,
-                  fontWeight: FontWeight.w800,
+                const SizedBox(height: 22),
+                const Text(
+                  'Fisherman Access',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 28,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Use your mobile number to securely enter ORCA. '
-                'No email or complex password is required.',
-                style: TextStyle(
-                  color: Color(0xFF617783),
-                  fontSize: 15,
-                  height: 1.5,
+                const SizedBox(height: 8),
+                const Text(
+                  'Use your mobile number to securely enter ORCA. '
+                  'No email or complex password is required.',
+                  style: TextStyle(
+                    color: AppTheme.muted,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              TextField(
-                controller: phoneController,
-                enabled: !isLoading,
-                keyboardType: TextInputType.phone,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _sendOtp(),
-                decoration: InputDecoration(
-                  labelText: 'Mobile Number',
-                  hintText: '98765 43210',
-                  prefixIcon: const Padding(
-                    padding: EdgeInsets.only(left: 16, right: 10),
-                    child: Center(
-                      widthFactor: 1,
-                      child: Text(
-                        '+91',
-                        style: TextStyle(
-                          color: AppTheme.navy,
-                          fontWeight: FontWeight.w800,
+                const SizedBox(height: 26),
+                TextField(
+                  controller: phoneController,
+                  enabled: !isLoading,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _sendOtp(),
+                  decoration: const InputDecoration(
+                    labelText: 'Mobile Number',
+                    hintText: '98765 43210',
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(left: 16, right: 10),
+                      child: Center(
+                        widthFactor: 1,
+                        child: Text(
+                          '+91',
+                          style: TextStyle(
+                            color: AppTheme.ink,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: const BorderSide(color: Color(0xFFDCE7EC)),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lavenderSoft,
+                    borderRadius: BorderRadius.circular(AppTheme.radius + 4),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: const BorderSide(
-                      color: AppTheme.oceanBlue,
-                      width: 1.5,
-                    ),
+                  child: Row(
+                    children: [
+                      const SoftIcon(
+                        Icons.language_rounded,
+                        color: AppTheme.indigo,
+                        background: Colors.white,
+                        size: 40,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Selected language: ${widget.selectedLanguage}\n'
+                          'ORCA will keep this preference during onboarding.',
+                          style: const TextStyle(
+                            color: AppTheme.charcoal,
+                            fontSize: 12.5,
+                            height: 1.45,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 58,
-                child: FilledButton(
+                const SizedBox(height: 24),
+                ElevatedButton(
                   onPressed: isLoading ? null : _sendOtp,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.navy,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
                   child: isLoading
                       ? const SizedBox(
                           width: 23,
@@ -181,42 +200,10 @@ class _FishermanPhoneAuthScreenState extends State<FishermanPhoneAuthScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Send OTP',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
+                      : const Text('Send OTP'),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F6F6),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.language_rounded, color: AppTheme.cyan),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Selected language: ${widget.selectedLanguage}\n'
-                        'ORCA will keep this preference during onboarding.',
-                        style: const TextStyle(
-                          color: AppTheme.navy,
-                          fontSize: 12.5,
-                          height: 1.45,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

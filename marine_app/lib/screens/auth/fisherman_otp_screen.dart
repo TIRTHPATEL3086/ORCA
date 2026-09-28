@@ -8,6 +8,8 @@ import '../../models/user_role.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../services/auth_service.dart';
 import '../../services/session_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 import 'fisherman_registration_screen.dart';
 
 class FishermanOtpScreen extends StatefulWidget {
@@ -182,116 +184,137 @@ class _FishermanOtpScreenState extends State<FishermanOtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F8FA),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                onPressed: isLoading ? null : () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_rounded),
-              ),
-              const SizedBox(height: 34),
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.oceanBlue, AppTheme.cyan],
+      body: GridBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed:
+                          isLoading ? null : () => Navigator.pop(context),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Expanded(child: PillProgress(value: 0.66)),
+                    const SizedBox(width: 12),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      OrcaMascot(
+                        size: 120,
+                        mood: MascotMood.sparkle,
+                        halo: true,
+                      ),
+                      Positioned(
+                        right: -6,
+                        bottom: 6,
+                        child: SoftIcon(
+                          Icons.sms_outlined,
+                          color: AppTheme.indigo,
+                          background: AppTheme.lavenderSoft,
+                          size: 44,
+                        ),
+                      ),
+                    ],
                   ),
-                  borderRadius: BorderRadius.circular(22),
                 ),
-                child: const Icon(
-                  Icons.sms_outlined,
-                  color: Colors.white,
-                  size: 34,
-                ),
-              ),
-              const SizedBox(height: 26),
-              const Text(
-                'Verify your number',
-                style: TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Enter the 6-digit code for '
-                '${widget.phoneNumber}.',
-                style: const TextStyle(
-                  color: Color(0xFF617783),
-                  fontSize: 15,
-                  height: 1.45,
-                ),
-              ),
-              if (devOtp != null) ...[
-                const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF3D8),
-                    borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 22),
+                const Text(
+                  'Verify your number',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 28,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
                   ),
-                  child: Text(
-                    'Development OTP: $devOtp',
-                    style: const TextStyle(
-                      color: Color(0xFF7B5A00),
-                      fontWeight: FontWeight.w800,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Enter the 6-digit code for '
+                  '${widget.phoneNumber}.',
+                  style: const TextStyle(
+                    color: AppTheme.muted,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+                if (devOtp != null) ...[
+                  const SizedBox(height: 18),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.butter,
+                      borderRadius: BorderRadius.circular(AppTheme.radius),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.bug_report_outlined,
+                          color: AppTheme.ink,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Development OTP: $devOtp',
+                            style: const TextStyle(
+                              color: AppTheme.ink,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 24),
+                TextField(
+                  controller: otpController,
+                  enabled: !isLoading,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.done,
+                  maxLength: 6,
+                  textAlign: TextAlign.center,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  style: const TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 14,
+                  ),
+                  onSubmitted: (_) => _verify(),
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    hintText: '••••••',
+                    hintStyle: TextStyle(
+                      color: AppTheme.line,
+                      letterSpacing: 14,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 20,
                     ),
                   ),
                 ),
-              ],
-              const SizedBox(height: 26),
-              TextField(
-                controller: otpController,
-                enabled: !isLoading,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-                maxLength: 6,
-                textAlign: TextAlign.center,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: const TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 10,
-                ),
-                onSubmitted: (_) => _verify(),
-                decoration: InputDecoration(
-                  counterText: '',
-                  hintText: '••••••',
-                  filled: true,
-                  fillColor: Colors.white,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: const BorderSide(color: Color(0xFFDCE7EC)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: const BorderSide(
-                      color: AppTheme.oceanBlue,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 58,
-                child: FilledButton(
+                const SizedBox(height: 24),
+                ElevatedButton(
                   onPressed: isLoading ? null : _verify,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.navy,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
                   child: isLoading
                       ? const SizedBox(
                           width: 23,
@@ -301,30 +324,37 @@ class _FishermanOtpScreenState extends State<FishermanOtpScreen> {
                             strokeWidth: 2.4,
                           ),
                         )
-                      : const Text(
-                          'Verify & Continue',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                      : const Text('Verify & Continue'),
+                ),
+                const SizedBox(height: 14),
+                Center(
+                  child: secondsRemaining > 0
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          child: Text(
+                            'Code expires in ${_timerText()}',
+                            style: const TextStyle(
+                              color: AppTheme.muted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      : TextButton(
+                          onPressed: isResending ? null : _resendOtp,
+                          child: Text(
+                            isResending ? 'Requesting...' : 'Request a new OTP',
                           ),
                         ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Center(
-                child: secondsRemaining > 0
-                    ? Text(
-                        'Code expires in ${_timerText()}',
-                        style: const TextStyle(color: Color(0xFF70858F)),
-                      )
-                    : TextButton(
-                        onPressed: isResending ? null : _resendOtp,
-                        child: Text(
-                          isResending ? 'Requesting...' : 'Request a new OTP',
-                        ),
-                      ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

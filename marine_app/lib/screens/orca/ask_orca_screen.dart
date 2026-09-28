@@ -26,6 +26,10 @@ import '../gis/plan_trip_screen.dart';
 
 import '../marine/sea_conditions_screen.dart';
 
+import '../../widgets/orca_mascot.dart';
+
+import '../../widgets/talkie_ui.dart';
+
 
 
 class AskOrcaScreen extends StatefulWidget {
@@ -1128,154 +1132,101 @@ final previous = List<OrcaChatMessageData>.from(messages);
 
 
   @override
-
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor: const Color(0xFFF4F8FA),
-
       appBar: AppBar(
-
         title: Text(tr('title')),
-
-        backgroundColor: Colors.transparent,
-
-        elevation: 0,
-
         actions: [
-
-          IconButton(
-
-            tooltip: tr('clear'),
-
-            onPressed: _clear,
-
-            icon: const Icon(Icons.delete_outline_rounded),
-
-          ),
-
-        ],
-
-      ),
-
-      body: loading
-
-          ? const Center(child: CircularProgressIndicator())
-
-          : Column(
-
-              children: [
-
-                _locationBar(),
-
-                Expanded(
-
-                  child: ListView(
-
-                    controller: scrollController,
-
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
-
-                    children: [
-
-                      if (messages.isEmpty) _welcome(),
-
-                      ...messages.map(_bubble),
-
-                      if (asking) _thinking(),
-
-                      if (error != null) _error(error!),
-
-                      if (lastResponse != null) ...[
-
-                        const SizedBox(height: 10),
-
-                        _structured(lastResponse!),
-
-                      ],
-
-                    ],
-
-                  ),
-
-                ),
-
-                _composer(),
-
-              ],
-
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              tooltip: tr('clear'),
+              style: IconButton.styleFrom(backgroundColor: Colors.white),
+              onPressed: _clear,
+              icon: const Icon(Icons.delete_outline_rounded),
             ),
-
+          ),
+        ],
+      ),
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  _locationBar(),
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+                      children: [
+                        if (messages.isEmpty) _welcome(),
+                        ...messages.map(_bubble),
+                        if (asking) _thinking(),
+                        if (error != null) _error(error!),
+                        if (lastResponse != null) ...[
+                          const SizedBox(height: 12),
+                          _structured(lastResponse!),
+                        ],
+                      ],
+                    ),
+                  ),
+                  _composer(),
+                ],
+              ),
+      ),
     );
-
   }
 
-
-
   Widget _locationBar() {
+    final iconColor = useDemoSeaPoint
+        ? AppTheme.warning
+        : position != null
+            ? AppTheme.coralDeep
+            : AppTheme.warning;
 
     return Container(
-
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
       decoration: BoxDecoration(
-
         color: Colors.white,
-
-        borderRadius: BorderRadius.circular(18),
-
-        border: Border.all(color: const Color(0xFFE0E9ED)),
-
+        borderRadius: BorderRadius.circular(40),
       ),
-
       child: Row(
-
         children: [
-
-          Icon(
-            useDemoSeaPoint
-                ? Icons.science_rounded
-                : position != null
-                    ? Icons.my_location_rounded
-                    : Icons.location_off_rounded,
-            color: useDemoSeaPoint
-                ? AppTheme.warning
-                : position != null
-                    ? AppTheme.oceanBlue
-                    : AppTheme.warning,
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              useDemoSeaPoint
+                  ? Icons.science_rounded
+                  : position != null
+                      ? Icons.my_location_rounded
+                      : Icons.location_off_rounded,
+              color: iconColor,
+              size: 18,
+            ),
           ),
-
-          const SizedBox(width: 8),
-
+          const SizedBox(width: 10),
           Expanded(
-
             child: Text(
-
               useDemoSeaPoint
                   ? tr('demo')
                   : position != null
                       ? tr('gps')
                       : vtr('gps_missing'),
-
               style: const TextStyle(
-
-                color: AppTheme.navy,
-
-                fontWeight: FontWeight.w700,
-
+                color: AppTheme.ink,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
               ),
-
             ),
-
           ),
-
           Switch.adaptive(
-
             value: useDemoSeaPoint,
-
             onChanged: (value) async {
               setState(() {
                 useDemoSeaPoint = value;
@@ -1290,18 +1241,11 @@ final previous = List<OrcaChatMessageData>.from(messages);
                 }
               }
             },
-
           ),
-
         ],
-
       ),
-
     );
-
   }
-
-
 
   Widget _welcome() {
     final prompts =
@@ -1314,92 +1258,104 @@ final previous = List<OrcaChatMessageData>.from(messages);
             : vtr('voice_partial');
 
     final voiceColor = !voiceChecked
-        ? AppTheme.oceanBlue
+        ? AppTheme.indigo
         : speechReady && ttsReady
             ? AppTheme.success
             : AppTheme.warning;
 
+    const chipColors = [
+      AppTheme.coralSoft,
+      AppTheme.lavenderSoft,
+      AppTheme.limeSoft,
+      AppTheme.sage,
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppTheme.navy,
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                vtr('welcome'),
-                style: const TextStyle(
-                  color: Colors.white,
-                  height: 1.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 13),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 11,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      speechReady && ttsReady
-                          ? Icons.record_voice_over_rounded
-                          : Icons.info_outline_rounded,
-                      color: voiceColor,
-                      size: 19,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        voiceLabel,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        const SizedBox(height: 8),
+        const Center(
+          child: OrcaMascot(size: 132, mood: MascotMood.sparkle, halo: true),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          vtr('welcome'),
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppTheme.ink,
+            fontSize: 17,
+            height: 1.4,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 14),
+        Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 9,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  speechReady && ttsReady
+                      ? Icons.record_voice_over_rounded
+                      : Icons.info_outline_rounded,
+                  color: voiceColor,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    voiceLabel,
+                    style: const TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
         Text(
           vtr('quick'),
           style: const TextStyle(
-            color: AppTheme.navy,
-            fontWeight: FontWeight.w900,
-            fontSize: 14,
+            color: AppTheme.ink,
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Wrap(
-          spacing: 7,
-          runSpacing: 7,
+          spacing: 8,
+          runSpacing: 8,
           children: prompts
+              .asMap()
+              .entries
               .map(
-                (prompt) => ActionChip(
+                (entry) => ActionChip(
+                  backgroundColor: chipColors[entry.key % chipColors.length],
+                  side: BorderSide.none,
                   avatar: const Icon(
                     Icons.mic_rounded,
                     size: 16,
+                    color: AppTheme.coralDeep,
                   ),
-                  label: Text(prompt),
+                  label: Text(entry.value),
                   onPressed: asking
                       ? null
                       : () async {
-                          controller.text = prompt;
+                          controller.text = entry.value;
                           controller.selection =
                               TextSelection.fromPosition(
                             TextPosition(
@@ -1416,103 +1372,131 @@ final previous = List<OrcaChatMessageData>.from(messages);
     );
   }
 
-  Widget _bubble(OrcaChatMessageData message) {
+  Widget _assistantAvatar() {
+    return Container(
+      width: 34,
+      height: 34,
+      margin: const EdgeInsets.only(right: 8),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: const OrcaMascot(size: 34, mood: MascotMood.happy),
+    );
+  }
 
+  Widget _bubble(OrcaChatMessageData message) {
     final user = message.role == 'user';
 
-
-
-    return Align(
-
-      alignment: user ? Alignment.centerRight : Alignment.centerLeft,
-
-      child: Container(
-
-        constraints: const BoxConstraints(maxWidth: 330),
-
-        margin: const EdgeInsets.only(top: 10),
-
-        padding: const EdgeInsets.all(14),
-
-        decoration: BoxDecoration(
-
-          color: user ? AppTheme.oceanBlue : Colors.white,
-
-          borderRadius: BorderRadius.circular(19),
-
-          border: user ? null : Border.all(color: const Color(0xFFE0E9ED)),
-
+    final bubble = Container(
+      constraints: const BoxConstraints(maxWidth: 300),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      decoration: BoxDecoration(
+        color: user ? AppTheme.coral : Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(20),
+          topRight: const Radius.circular(20),
+          bottomLeft: Radius.circular(user ? 20 : 6),
+          bottomRight: Radius.circular(user ? 6 : 20),
         ),
-
-        child: Text(
-
-          message.content,
-
-          style: TextStyle(
-
-            color: user ? Colors.white : AppTheme.navy,
-
-            height: 1.45,
-
-          ),
-
+      ),
+      child: Text(
+        message.content,
+        style: TextStyle(
+          color: user ? Colors.white : AppTheme.ink,
+          height: 1.45,
+          fontWeight: user ? FontWeight.w500 : FontWeight.w400,
         ),
-
       ),
-
     );
-
-  }
-
-
-
-  Widget _thinking() {
-
-    return const Padding(
-
-      padding: EdgeInsets.only(top: 14),
-
-      child: Row(
-
-        children: [
-
-          SizedBox(
-
-            width: 22,
-
-            height: 22,
-
-            child: CircularProgressIndicator(strokeWidth: 2.5),
-
-          ),
-
-          SizedBox(width: 10),
-
-          Text('ORCA agents are checking evidence...'),
-
-        ],
-
-      ),
-
-    );
-
-  }
-
-
-
-  Widget _error(String value) {
 
     return Padding(
-
-      padding: const EdgeInsets.only(top: 12),
-
-      child: Text(value, style: const TextStyle(color: AppTheme.danger)),
-
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        mainAxisAlignment:
+            user ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!user) _assistantAvatar(),
+          Flexible(child: bubble),
+        ],
+      ),
     );
-
   }
 
+  Widget _thinking() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _assistantAvatar(),
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 11,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(6),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2.4),
+                  ),
+                  SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      'ORCA agents are checking evidence...',
+                      style: TextStyle(color: AppTheme.muted),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _error(String value) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: AppTheme.danger.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.error_outline_rounded,
+            color: AppTheme.danger,
+            size: 20,
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(color: AppTheme.danger, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _structured(OrcaAgentResponseData data) {
     final isPositive =
@@ -1531,11 +1515,10 @@ final previous = List<OrcaChatMessageData>.from(messages);
             : AppTheme.warning;
 
     return Container(
-      padding: const EdgeInsets.all(17),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE0E9ED)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1544,25 +1527,23 @@ final previous = List<OrcaChatMessageData>.from(messages);
             width: double.infinity,
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: decisionColor.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(17),
-              border: Border.all(
-                color: decisionColor.withValues(alpha: 0.30),
-              ),
+              color: decisionColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
+                SoftIcon(
                   isPositive
                       ? Icons.check_circle_rounded
                       : isStop
                           ? Icons.cancel_rounded
                           : Icons.warning_amber_rounded,
-                  color: decisionColor,
-                  size: 30,
+                  color: Colors.white,
+                  background: decisionColor,
+                  size: 44,
                 ),
-                const SizedBox(width: 11),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1572,17 +1553,19 @@ final previous = List<OrcaChatMessageData>.from(messages);
                         style: TextStyle(
                           color: decisionColor,
                           fontSize: 12,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         data.shortAnswer,
                         style: const TextStyle(
-                          color: AppTheme.navy,
+                          color: AppTheme.ink,
                           fontSize: 18,
                           height: 1.25,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3,
                         ),
                       ),
                     ],
@@ -1592,7 +1575,7 @@ final previous = List<OrcaChatMessageData>.from(messages);
             ),
           ),
 
-          const SizedBox(height: 15),
+          const SizedBox(height: 16),
           _section(tr('why'), data.laymanExplanation),
           _section(tr('action'), data.recommendation),
 
@@ -1622,16 +1605,20 @@ final previous = List<OrcaChatMessageData>.from(messages);
           ExpansionTile(
             tilePadding: EdgeInsets.zero,
             childrenPadding: const EdgeInsets.only(bottom: 4),
+            shape: const Border(),
+            collapsedShape: const Border(),
+            iconColor: AppTheme.coralDeep,
+            collapsedIconColor: AppTheme.muted,
             title: Text(
               tr('evidence'),
               style: const TextStyle(
-                color: AppTheme.navy,
-                fontWeight: FontWeight.w800,
+                color: AppTheme.ink,
+                fontWeight: FontWeight.w700,
               ),
             ),
             subtitle: const Text(
               'Sources, live values and agents used',
-              style: TextStyle(fontSize: 11.5),
+              style: TextStyle(fontSize: 11.5, color: AppTheme.muted),
             ),
             children: [
               if (data.executedTools.isNotEmpty) ...[
@@ -1641,7 +1628,13 @@ final previous = List<OrcaChatMessageData>.from(messages);
                     spacing: 7,
                     runSpacing: 7,
                     children: data.executedTools
-                        .map((tool) => Chip(label: Text(tool)))
+                        .map(
+                          (tool) => Chip(
+                            backgroundColor: AppTheme.lavenderSoft,
+                            side: BorderSide.none,
+                            label: Text(tool),
+                          ),
+                        )
                         .toList(),
                   ),
                 ),
@@ -1655,7 +1648,7 @@ final previous = List<OrcaChatMessageData>.from(messages);
                     child: Text(
                       '${e.label}: ${e.value} • ${e.source}',
                       style: const TextStyle(
-                        color: Color(0xFF667A82),
+                        color: AppTheme.muted,
                         fontSize: 11.5,
                         height: 1.35,
                       ),
@@ -1670,6 +1663,12 @@ final previous = List<OrcaChatMessageData>.from(messages);
             alignment: Alignment.centerLeft,
             child: OutlinedButton.icon(
               onPressed: () => _speak(_speechSummary(data)),
+              style: OutlinedButton.styleFrom(
+                backgroundColor: AppTheme.coralSoft,
+                foregroundColor: AppTheme.coralDeep,
+                side: BorderSide.none,
+                shape: const StadiumBorder(),
+              ),
               icon: const Icon(Icons.volume_up_rounded),
               label: Text(tr('speak')),
             ),
@@ -1679,149 +1678,125 @@ final previous = List<OrcaChatMessageData>.from(messages);
     );
   }
 
-
   Widget _section(String title, String body) {
-
     return Padding(
-
-      padding: const EdgeInsets.only(bottom: 11),
-
+      padding: const EdgeInsets.only(bottom: 12),
       child: Column(
-
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
-
           Text(
-
             title,
-
             style: const TextStyle(
-
-              color: AppTheme.oceanBlue,
-
-              fontSize: 11,
-
-              fontWeight: FontWeight.w900,
-
+              color: AppTheme.coralDeep,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
             ),
-
           ),
-
-          const SizedBox(height: 3),
-
+          const SizedBox(height: 4),
           Text(
-
             body,
-
             style: const TextStyle(
-
-              color: AppTheme.navy,
-
+              color: AppTheme.ink,
               fontSize: 14.5,
-
               height: 1.45,
-
-              fontWeight: FontWeight.w700,
-
+              fontWeight: FontWeight.w500,
             ),
-
           ),
-
         ],
-
       ),
-
     );
-
   }
-
-
 
   Widget _composer() {
-
-    return Container(
-
+    return Padding(
       padding: EdgeInsets.fromLTRB(
-
-        12,
-
-        9,
-
-        12,
-
-        9 + MediaQuery.of(context).padding.bottom,
-
+        14,
+        6,
+        14,
+        12 + MediaQuery.of(context).padding.bottom,
       ),
-
-      color: Colors.white,
-
       child: Row(
-
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-
-          IconButton.filledTonal(
-
-            onPressed: _listen,
-
-            icon: Icon(listening ? Icons.mic_rounded : Icons.mic_none_rounded),
-
-          ),
-
-          const SizedBox(width: 7),
-
           Expanded(
-
-            child: TextField(
-
-              controller: controller,
-
-              minLines: 1,
-
-              maxLines: 4,
-
-              textInputAction: TextInputAction.send,
-
-              onSubmitted: (_) => _ask(),
-
-              decoration: InputDecoration(
-
-                hintText: listening ? tr('listening') : tr('hint'),
-
-                filled: true,
-
-                fillColor: const Color(0xFFF4F8FA),
-
-                border: OutlineInputBorder(
-
-                  borderRadius: BorderRadius.circular(18),
-
-                  borderSide: BorderSide.none,
-
-                ),
-
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(4, 4, 6, 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: AppTheme.softShadow,
               ),
-
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      minLines: 1,
+                      maxLines: 4,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _ask(),
+                      decoration: InputDecoration(
+                        hintText: listening ? tr('listening') : tr('hint'),
+                        fillColor: Colors.transparent,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: IconButton.filled(
+                      onPressed: asking ? null : _ask,
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppTheme.charcoal,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: AppTheme.sage,
+                      ),
+                      icon: const Icon(Icons.arrow_upward_rounded),
+                    ),
+                  ),
+                ],
+              ),
             ),
-
           ),
-
-          const SizedBox(width: 7),
-
-          IconButton.filled(
-
-            onPressed: asking ? null : _ask,
-
-            icon: const Icon(Icons.arrow_upward_rounded),
-
+          const SizedBox(width: 10),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: listening
+                  ? [
+                      BoxShadow(
+                        color: AppTheme.coral.withValues(alpha: 0.35),
+                        blurRadius: 18,
+                        spreadRadius: 4,
+                      ),
+                    ]
+                  : AppTheme.softShadow,
+            ),
+            child: IconButton.filled(
+              onPressed: _listen,
+              style: IconButton.styleFrom(
+                backgroundColor:
+                    listening ? AppTheme.coralDeep : AppTheme.coral,
+                foregroundColor: Colors.white,
+                fixedSize: const Size(58, 58),
+              ),
+              icon: Icon(
+                listening ? Icons.mic_rounded : Icons.mic_none_rounded,
+                size: 28,
+              ),
+            ),
           ),
-
         ],
-
       ),
-
     );
-
   }
-
 }

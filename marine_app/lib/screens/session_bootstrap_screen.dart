@@ -6,6 +6,8 @@ import '../models/user_role.dart';
 import '../services/auth_service.dart';
 import '../services/session_service.dart';
 import '../services/session_validation_service.dart';
+import '../widgets/orca_mascot.dart';
+import '../widgets/talkie_ui.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'splash_screen.dart';
 
@@ -90,32 +92,33 @@ class _SessionBootstrapScreenState extends State<SessionBootstrapScreen> {
         }
 
         return const Scaffold(
-          backgroundColor: AppTheme.navy,
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.waves_rounded, color: Colors.white, size: 52),
-                SizedBox(height: 18),
-                Text(
-                  'ORCA',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2,
+          body: GridBackground(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OrcaMascot(size: 120, mood: MascotMood.calm, halo: true),
+                  SizedBox(height: 18),
+                  Text(
+                    'ORCA',
+                    style: TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ),
-                SizedBox(height: 24),
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    color: AppTheme.cyan,
-                    strokeWidth: 2.5,
+                  SizedBox(height: 24),
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      color: AppTheme.coral,
+                      strokeWidth: 2.5,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

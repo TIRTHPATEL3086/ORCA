@@ -6,6 +6,8 @@ import '../../models/user_role.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../services/auth_service.dart';
 import '../../services/session_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 
 class FishermanRegistrationScreen extends StatefulWidget {
   final String phoneNumber;
@@ -133,129 +135,159 @@ class _FishermanRegistrationScreenState
       labelText: label,
       hintText: hint,
       prefixIcon: Icon(icon),
-      filled: true,
-      fillColor: Colors.white,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFDCE7EC)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: AppTheme.oceanBlue, width: 1.5),
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F8FA),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                onPressed: isLoading ? null : () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_rounded),
-              ),
-              const SizedBox(height: 28),
-              const Text(
-                'Set up your\nORCA profile',
-                style: TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 33,
-                  height: 1.08,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Phone verified: ${widget.phoneNumber}',
-                style: const TextStyle(color: Color(0xFF617783), fontSize: 14),
-              ),
-              const SizedBox(height: 28),
-              TextField(
-                controller: nameController,
-                enabled: !isLoading,
-                textCapitalization: TextCapitalization.words,
-                decoration: _decoration(
-                  label: 'Full Name *',
-                  icon: Icons.person_outline_rounded,
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: landingCentreController,
-                enabled: !isLoading,
-                textCapitalization: TextCapitalization.words,
-                decoration: _decoration(
-                  label: 'Home Landing Centre',
-                  icon: Icons.place_outlined,
-                  hint: 'Optional for now',
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: emergencyNameController,
-                enabled: !isLoading,
-                textCapitalization: TextCapitalization.words,
-                decoration: _decoration(
-                  label: 'Emergency Contact Name',
-                  icon: Icons.contact_emergency_outlined,
-                  hint: 'Optional for now',
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: emergencyPhoneController,
-                enabled: !isLoading,
-                keyboardType: TextInputType.phone,
-                decoration: _decoration(
-                  label: 'Emergency Contact Number',
-                  icon: Icons.phone_outlined,
-                  hint: 'Optional for now',
-                ),
-              ),
-              const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F6F6),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: GridBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    const Icon(Icons.language_rounded, color: AppTheme.cyan),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Preferred language: ${widget.selectedLanguage}\n'
-                        'ORCA will store this preference with your account.',
-                        style: const TextStyle(
-                          color: AppTheme.navy,
-                          fontSize: 12.5,
-                          height: 1.45,
-                        ),
+                    IconButton(
+                      onPressed:
+                          isLoading ? null : () => Navigator.pop(context),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 20,
                       ),
                     ),
+                    const SizedBox(width: 6),
+                    const Expanded(child: PillProgress(value: 1)),
+                    const SizedBox(width: 12),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 58,
-                child: FilledButton(
-                  onPressed: isLoading ? null : _completeRegistration,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.navy,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
+                const SizedBox(height: 12),
+                const Center(
+                  child: OrcaMascot(
+                    size: 100,
+                    mood: MascotMood.happy,
+                    halo: true,
                   ),
+                ),
+                const SizedBox(height: 18),
+                const Text(
+                  'Set up your\nORCA profile',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 28,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.limeSoft,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.verified_rounded,
+                        color: AppTheme.success,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Phone verified: ${widget.phoneNumber}',
+                        style: const TextStyle(
+                          color: AppTheme.ink,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: nameController,
+                  enabled: !isLoading,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: _decoration(
+                    label: 'Full Name *',
+                    icon: Icons.person_outline_rounded,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: landingCentreController,
+                  enabled: !isLoading,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: _decoration(
+                    label: 'Home Landing Centre',
+                    icon: Icons.place_outlined,
+                    hint: 'Optional for now',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: emergencyNameController,
+                  enabled: !isLoading,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: _decoration(
+                    label: 'Emergency Contact Name',
+                    icon: Icons.contact_emergency_outlined,
+                    hint: 'Optional for now',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: emergencyPhoneController,
+                  enabled: !isLoading,
+                  keyboardType: TextInputType.phone,
+                  decoration: _decoration(
+                    label: 'Emergency Contact Number',
+                    icon: Icons.phone_outlined,
+                    hint: 'Optional for now',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lavenderSoft,
+                    borderRadius: BorderRadius.circular(AppTheme.radius + 4),
+                  ),
+                  child: Row(
+                    children: [
+                      const SoftIcon(
+                        Icons.language_rounded,
+                        color: AppTheme.indigo,
+                        background: Colors.white,
+                        size: 40,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Preferred language: ${widget.selectedLanguage}\n'
+                          'ORCA will store this preference with your account.',
+                          style: const TextStyle(
+                            color: AppTheme.charcoal,
+                            fontSize: 12.5,
+                            height: 1.45,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: isLoading ? null : _completeRegistration,
                   child: isLoading
                       ? const SizedBox(
                           width: 23,
@@ -265,13 +297,10 @@ class _FishermanRegistrationScreenState
                             strokeWidth: 2.4,
                           ),
                         )
-                      : const Text(
-                          'Create ORCA Fisher Profile',
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
+                      : const Text('Create ORCA Fisher Profile'),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

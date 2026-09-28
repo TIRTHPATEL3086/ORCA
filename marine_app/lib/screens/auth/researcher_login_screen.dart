@@ -4,6 +4,8 @@ import '../../core/theme/app_theme.dart';
 import '../../models/user_role.dart';
 import '../../services/auth_service.dart';
 import '../../services/session_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 import '../dashboard/dashboard_screen.dart';
 import 'register_screen.dart';
 
@@ -95,112 +97,103 @@ class _ResearcherLoginScreenState extends State<ResearcherLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const accent = Color(0xFF237A67);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F8FA),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                onPressed: isLoading ? null : () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_rounded),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF156F63), Color(0xFF35A58D)],
-                  ),
-                  borderRadius: BorderRadius.circular(22),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accent.withValues(alpha: 0.18),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
+      body: GridBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconButton(
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
                 ),
-                child: const Icon(
-                  Icons.science_rounded,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-              const SizedBox(height: 26),
-              const Text(
-                'Marine Researcher',
-                style: TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Sign in to the ORCA research workspace for '
-                'marine datasets, spatial-temporal analysis, '
-                'anomalies, evidence and reporting.',
-                style: TextStyle(
-                  color: Color(0xFF617783),
-                  fontSize: 14.5,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: emailController,
-                enabled: !isLoading,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                decoration: _field(
-                  label: 'Email Address',
-                  icon: Icons.email_outlined,
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: passwordController,
-                enabled: !isLoading,
-                obscureText: obscurePassword,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _signIn(),
-                decoration:
-                    _field(
-                      label: 'Password',
-                      icon: Icons.lock_outline_rounded,
-                    ).copyWith(
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            obscurePassword = !obscurePassword;
-                          });
-                        },
-                        icon: Icon(
-                          obscurePassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
+                const SizedBox(height: 18),
+                const Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      OrcaMascot(
+                        size: 120,
+                        mood: MascotMood.sparkle,
+                        halo: true,
+                      ),
+                      Positioned(
+                        right: -6,
+                        bottom: 6,
+                        child: SoftIcon(
+                          Icons.science_rounded,
+                          color: AppTheme.ink,
+                          background: AppTheme.lime,
+                          size: 44,
                         ),
                       ),
-                    ),
-              ),
-              const SizedBox(height: 22),
-              SizedBox(
-                width: double.infinity,
-                height: 58,
-                child: FilledButton(
-                  onPressed: isLoading ? null : _signIn,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: accent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
+                    ],
                   ),
+                ),
+                const SizedBox(height: 22),
+                const Text(
+                  'Marine Researcher',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 28,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Sign in to the ORCA research workspace for '
+                  'marine datasets, spatial-temporal analysis, '
+                  'anomalies, evidence and reporting.',
+                  style: TextStyle(
+                    color: AppTheme.muted,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 26),
+                TextField(
+                  controller: emailController,
+                  enabled: !isLoading,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  decoration: _field(
+                    label: 'Email Address',
+                    icon: Icons.email_outlined,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: passwordController,
+                  enabled: !isLoading,
+                  obscureText: obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _signIn(),
+                  decoration:
+                      _field(
+                        label: 'Password',
+                        icon: Icons.lock_outline_rounded,
+                      ).copyWith(
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                        ),
+                      ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: isLoading ? null : _signIn,
                   child: isLoading
                       ? const SizedBox(
                           width: 23,
@@ -210,20 +203,17 @@ class _ResearcherLoginScreenState extends State<ResearcherLoginScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Sign In to Research Workspace',
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
+                      : const Text('Sign In to Research Workspace'),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Center(
-                child: TextButton(
-                  onPressed: isLoading ? null : _openRegistration,
-                  child: const Text('New researcher? Create an account'),
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton(
+                    onPressed: isLoading ? null : _openRegistration,
+                    child: const Text('New researcher? Create an account'),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -234,16 +224,6 @@ class _ResearcherLoginScreenState extends State<ResearcherLoginScreen> {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
-      filled: true,
-      fillColor: Colors.white,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFDCE7EC)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFF237A67), width: 1.5),
-      ),
     );
   }
 }

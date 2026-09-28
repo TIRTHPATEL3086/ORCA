@@ -8,6 +8,8 @@ import '../../models/gis_models.dart';
 import '../../services/fisherman_service.dart';
 import '../../services/gis_service.dart';
 import '../../services/offline_readiness_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 import 'mission_tracking_screen.dart';
 
 class PlanTripScreen extends StatefulWidget {
@@ -345,46 +347,34 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FA),
-      appBar: AppBar(
-        title: const Text('Marine Trip Planner'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      appBar: AppBar(title: const Text('Marine Trip Planner')),
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? _errorView()
+            : _content(),
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? _errorView()
-          : _content(),
     );
   }
 
   Widget _offlineReadinessCard() {
     final full = offlineReadiness.startsWith('Offline Ready');
-    final color = full ? AppTheme.success : AppTheme.oceanBlue;
+    final color = full ? AppTheme.success : AppTheme.coralDeep;
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: color.withValues(alpha: 0.22),
-        ),
+        color: full ? AppTheme.limeSoft : Colors.white,
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              full ? Icons.offline_pin_rounded : Icons.shield_outlined,
-              color: color,
-            ),
+          SoftIcon(
+            full ? Icons.offline_pin_rounded : Icons.shield_outlined,
+            color: color,
+            background: full ? Colors.white : AppTheme.coralSoft,
+            size: 44,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -394,16 +384,17 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                 Text(
                   full ? 'Offline Ready' : 'Always-Ready Safety Cache',
                   style: const TextStyle(
-                    color: AppTheme.navy,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w900,
+                    color: AppTheme.ink,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   offlineReadiness,
                   style: const TextStyle(
-                    color: Color(0xFF637983),
+                    color: AppTheme.muted,
                     fontSize: 11.8,
                     height: 1.3,
                   ),
@@ -414,7 +405,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                     child: Text(
                       'Plan a route and ORCA prepares the Mission Pack automatically — no separate download step.',
                       style: TextStyle(
-                        color: Color(0xFF637983),
+                        color: AppTheme.muted,
                         fontSize: 11.2,
                         height: 1.3,
                       ),
@@ -442,13 +433,13 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.route_rounded,
-              size: 50,
-              color: AppTheme.oceanBlue,
+            const OrcaMascot(size: 104, mood: MascotMood.sleepy, halo: true),
+            const SizedBox(height: 16),
+            Text(
+              error!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppTheme.muted, height: 1.45),
             ),
-            const SizedBox(height: 14),
-            Text(error!, textAlign: TextAlign.center),
             const SizedBox(height: 16),
             FilledButton(onPressed: _bootstrap, child: const Text('Retry')),
           ],
@@ -468,29 +459,38 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         _offlineReadinessCard(),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFEAF6F8),
-            borderRadius: BorderRadius.circular(18),
+            color: AppTheme.lavenderSoft,
+            borderRadius: BorderRadius.circular(22),
           ),
-          child: const Text(
-            'ORCA now plans on a water-only grid. Land cells and loaded '
-            'demo geofences are blocked, while live wave, wind and ocean-current '
-            'conditions influence route cost and ETA.',
-            style: TextStyle(
-              color: Color(0xFF557079),
-              fontSize: 12.5,
-              height: 1.45,
-            ),
+          child: const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              OrcaMascot(size: 44, mood: MascotMood.sparkle),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'ORCA now plans on a water-only grid. Land cells and loaded '
+                  'demo geofences are blocked, while live wave, wind and ocean-current '
+                  'conditions influence route cost and ETA.',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 12.5,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 13),
+        const SizedBox(height: 14),
         Container(
           height: 400,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFDCE8EC)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
           child: Stack(
             children: [
@@ -531,7 +531,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                         Polyline(
                           points: selectedPoints,
                           strokeWidth: 5,
-                          color: AppTheme.oceanBlue,
+                          color: AppTheme.coral,
+                          borderStrokeWidth: 2,
+                          borderColor: Colors.white,
                         ),
                       ],
                     ),
@@ -544,7 +546,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                           height: 48,
                           child: _marker(
                             Icons.sailing_rounded,
-                            AppTheme.success,
+                            AppTheme.charcoal,
                           ),
                         ),
                       if (endPoint != null)
@@ -554,7 +556,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                           height: 48,
                           child: _marker(
                             Icons.flag_rounded,
-                            AppTheme.oceanBlue,
+                            AppTheme.coral,
                           ),
                         ),
                     ],
@@ -582,10 +584,16 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               ),
               if (calculating)
                 const Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  child: LinearProgressIndicator(),
+                  left: 14,
+                  right: 70,
+                  top: 14,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    child: LinearProgressIndicator(
+                      minHeight: 7,
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -594,20 +602,17 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         const Text(
           'Tap a water point for destination. If your phone GPS is on land, '
           'use the demo sea route for testing.',
-          style: TextStyle(color: Color(0xFF74868E), fontSize: 12.2),
+          style: TextStyle(color: AppTheme.muted, fontSize: 12.2),
         ),
         const SizedBox(height: 14),
         TextField(
           controller: speedController,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Vessel cruising speed',
             suffixText: 'kn',
             helperText: 'Uses saved vessel speed when available.',
-            prefixIcon: const Icon(Icons.speed_rounded),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
+            prefixIcon: Icon(Icons.speed_rounded),
           ),
         ),
         const SizedBox(height: 14),
@@ -615,18 +620,11 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
           height: 56,
           child: FilledButton.icon(
             onPressed: calculating ? null : _planRoute,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.navy,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-            ),
             icon: const Icon(Icons.alt_route_rounded),
             label: Text(
               calculating
                   ? 'Sampling sea conditions...'
                   : 'Build Weather-Aware Routes',
-              style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
         ),
@@ -635,15 +633,16 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
           const Text(
             'Choose a route',
             style: TextStyle(
-              color: AppTheme.navy,
-              fontSize: 21,
-              fontWeight: FontWeight.w900,
+              color: AppTheme.ink,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 4),
           const Text(
             'Compare arrival time with environmental exposure.',
-            style: TextStyle(color: Color(0xFF71838B), fontSize: 12.5),
+            style: TextStyle(color: AppTheme.muted, fontSize: 12.5),
           ),
           const SizedBox(height: 12),
           _routeChoice(plan!.fastest),
@@ -658,16 +657,14 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               child: FilledButton.icon(
                 onPressed: _startMission,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.success,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
+                  backgroundColor: AppTheme.coral,
+                  shape: const StadiumBorder(),
                 ),
                 icon: const Icon(Icons.navigation_rounded),
                 label: const Text(
                   'START MISSION',
                   style: TextStyle(
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 0.6,
                   ),
                 ),
@@ -675,15 +672,15 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             ),
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF7E8),
-                borderRadius: BorderRadius.circular(18),
+                color: AppTheme.butter.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 plan!.navigationNotice,
                 style: const TextStyle(
-                  color: Color(0xFF6C6048),
+                  color: AppTheme.ink,
                   fontSize: 11.8,
                   height: 1.45,
                 ),
@@ -701,6 +698,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         color: color,
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 3),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Icon(icon, color: Colors.white, size: 22),
     );
@@ -711,14 +709,20 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
     required String tooltip,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      elevation: 2,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: AppTheme.softShadow,
+      ),
       child: IconButton(
         tooltip: tooltip,
         onPressed: onTap,
-        icon: Icon(icon, color: AppTheme.navy),
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: AppTheme.ink,
+          shape: const CircleBorder(),
+        ),
+        icon: Icon(icon),
       ),
     );
   }
@@ -739,16 +743,15 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         }
       },
       borderRadius: BorderRadius.circular(22),
-      child: Container(
-        padding: const EdgeInsets.all(17),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: selected
-              ? AppTheme.oceanBlue.withValues(alpha: 0.08)
-              : Colors.white,
+          color: selected ? AppTheme.coralSoft : Colors.white,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: selected ? AppTheme.oceanBlue : const Color(0xFFE0E9ED),
-            width: selected ? 1.8 : 1,
+            color: selected ? AppTheme.coral : Colors.transparent,
+            width: 2,
           ),
         ),
         child: Column(
@@ -760,19 +763,20 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                   child: Text(
                     route.title,
                     style: const TextStyle(
-                      color: AppTheme.navy,
+                      color: AppTheme.ink,
                       fontSize: 17,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
                     ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
+                    horizontal: 10,
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
+                    color: color.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
@@ -780,7 +784,8 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                     style: TextStyle(
                       color: color,
                       fontSize: 10.5,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
                     ),
                   ),
                 ),
@@ -810,7 +815,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               '${route.maxWaveHeightM?.toStringAsFixed(1) ?? '--'} m'
               ' • Max wind '
               '${route.maxWindSpeedMs?.toStringAsFixed(1) ?? '--'} m/s',
-              style: const TextStyle(color: Color(0xFF657982), fontSize: 12.3),
+              style: const TextStyle(color: AppTheme.muted, fontSize: 12.3),
             ),
           ],
         ),
@@ -825,14 +830,15 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         Text(
           value,
           style: const TextStyle(
-            color: AppTheme.navy,
-            fontWeight: FontWeight.w900,
-            fontSize: 15,
+            color: AppTheme.ink,
+            fontWeight: FontWeight.w800,
+            fontSize: 19,
+            letterSpacing: -0.5,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF7C8D94), fontSize: 10.5),
+          style: const TextStyle(color: AppTheme.muted, fontSize: 10.5),
         ),
       ],
     );
@@ -857,8 +863,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE0E9ED)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -866,9 +871,10 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
           const Text(
             'Why ORCA selected this path',
             style: TextStyle(
-              color: AppTheme.navy,
+              color: AppTheme.ink,
               fontSize: 17,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 9),
@@ -893,7 +899,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                         child: Text(
                           line,
                           style: const TextStyle(
-                            color: Color(0xFF62767E),
+                            color: AppTheme.muted,
                             fontSize: 12.2,
                             height: 1.4,
                           ),
@@ -908,8 +914,8 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             const Text(
               'Conditions along route',
               style: TextStyle(
-                color: AppTheme.navy,
-                fontWeight: FontWeight.w900,
+                color: AppTheme.ink,
+                fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 9),
@@ -942,7 +948,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             child: Text(
               label,
               style: const TextStyle(
-                color: Color(0xFF71838B),
+                color: AppTheme.muted,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
               ),
@@ -953,7 +959,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               'Wave ${v(c.waveHeightM, 'm')} • '
               'Wind ${v(c.windSpeedMs, 'm/s')} • '
               'Current ${v(c.currentVelocityMs, 'm/s')}',
-              style: const TextStyle(color: AppTheme.navy, fontSize: 11.5),
+              style: const TextStyle(color: AppTheme.ink, fontSize: 11.5),
             ),
           ),
         ],

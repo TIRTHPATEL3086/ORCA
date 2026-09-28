@@ -8,6 +8,8 @@ import '../../models/gis_models.dart';
 import '../../models/marine_conditions.dart';
 import '../../services/gis_service.dart';
 import '../../services/marine_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 
 class BoundaryGuardianScreen extends StatefulWidget {
   const BoundaryGuardianScreen({super.key});
@@ -154,7 +156,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
   Color _statusColor(String status) {
     switch (status) {
       case 'LAND':
-        return const Color(0xFF795548);
+        return AppTheme.charcoal;
       case 'INSIDE':
       case 'HIGH':
         return AppTheme.danger;
@@ -164,7 +166,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
       case 'INDICATIVE_OUTSIDE':
         return AppTheme.warning;
       case 'UNAVAILABLE':
-        return const Color(0xFF7A8B92);
+        return AppTheme.muted;
       default:
         return AppTheme.success;
     }
@@ -173,17 +175,14 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FA),
-      appBar: AppBar(
-        title: const Text('Boundary Guardian'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      appBar: AppBar(title: const Text('Boundary Guardian')),
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? _errorView()
+            : _content(),
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? _errorView()
-          : _content(),
     );
   }
 
@@ -194,13 +193,13 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.public_off_rounded,
-              size: 50,
-              color: AppTheme.oceanBlue,
+            const OrcaMascot(size: 104, mood: MascotMood.sleepy, halo: true),
+            const SizedBox(height: 16),
+            Text(
+              error!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppTheme.muted, height: 1.45),
             ),
-            const SizedBox(height: 14),
-            Text(error!, textAlign: TextAlign.center),
             const SizedBox(height: 16),
             FilledButton(onPressed: _load, child: const Text('Retry')),
           ],
@@ -218,53 +217,59 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 30),
       children: [
         Container(
-          padding: const EdgeInsets.all(17),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.navy, Color(0xFF0B6681)],
-            ),
-            borderRadius: BorderRadius.circular(22),
+            color: AppTheme.coral,
+            borderRadius: BorderRadius.circular(28),
           ),
           child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.public_rounded, color: Colors.white, size: 30),
-              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SoftIcon(
+                      Icons.public_rounded,
+                      color: AppTheme.coralDeep,
+                      background: Colors.white,
+                      size: 44,
+                    ),
+                    SizedBox(height: 14),
                     Text(
                       'Maritime awareness',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 6),
                     Text(
                       'Check coast proximity, territorial-sea reference, '
                       'EEZ reference, restricted zones and temporary sea conditions.',
                       style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12.3,
+                        color: Color(0xE6FFFFFF),
+                        fontSize: 12.5,
                         height: 1.45,
                       ),
                     ),
                   ],
                 ),
               ),
+              SizedBox(width: 8),
+              OrcaMascot(size: 70, mood: MascotMood.calm, color: Colors.white),
             ],
           ),
         ),
-        const SizedBox(height: 13),
+        const SizedBox(height: 14),
         Container(
           height: 400,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFDCE8EC)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
           child: Stack(
             children: [
@@ -308,7 +313,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                           height: 46,
                           child: _marker(
                             Icons.my_location_rounded,
-                            AppTheme.oceanBlue,
+                            AppTheme.coral,
                           ),
                         ),
                       if (selectedPoint != null)
@@ -319,7 +324,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                           child: _marker(
                             Icons.place_rounded,
                             result?.surface == 'LAND'
-                                ? const Color(0xFF795548)
+                                ? AppTheme.charcoal
                                 : AppTheme.warning,
                           ),
                         ),
@@ -348,10 +353,16 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
               ),
               if (checking)
                 const Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  child: LinearProgressIndicator(),
+                  left: 14,
+                  right: 70,
+                  top: 14,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    child: LinearProgressIndicator(
+                      minHeight: 7,
+                      backgroundColor: Colors.white,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -359,7 +370,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
         const SizedBox(height: 10),
         const Text(
           'Tap a point to build a maritime-awareness report.',
-          style: TextStyle(color: Color(0xFF74868E), fontSize: 12.3),
+          style: TextStyle(color: AppTheme.muted, fontSize: 12.3),
         ),
         if (result != null) ...[const SizedBox(height: 18), _report(result!)],
       ],
@@ -373,9 +384,10 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
         const Text(
           'Boundary report',
           style: TextStyle(
-            color: AppTheme.navy,
+            color: AppTheme.ink,
             fontSize: 21,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
           ),
         ),
         const SizedBox(height: 12),
@@ -427,7 +439,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
           ? 'Unavailable'
           : '${value.toStringAsFixed(1)} km from land',
       body: data.coastDistanceNote ?? 'Approximate nearest coastline distance.',
-      color: AppTheme.oceanBlue,
+      color: AppTheme.coralDeep,
     );
   }
 
@@ -445,8 +457,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: const Color(0xFFE0E9ED)),
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,7 +469,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.10),
+                  color: color.withValues(alpha: 0.13),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: color),
@@ -471,8 +482,8 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                     Text(
                       data.label,
                       style: const TextStyle(
-                        color: AppTheme.navy,
-                        fontWeight: FontWeight.w900,
+                        color: AppTheme.ink,
+                        fontWeight: FontWeight.w800,
                         fontSize: 15.5,
                       ),
                     ),
@@ -481,7 +492,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                       data.status,
                       style: TextStyle(
                         color: color,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                     if (data.zoneName != null) ...[
@@ -489,7 +500,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                       Text(
                         data.zoneName!,
                         style: const TextStyle(
-                          color: Color(0xFF647881),
+                          color: AppTheme.muted,
                           fontSize: 12,
                         ),
                       ),
@@ -505,7 +516,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF4F8FA),
+                color: AppTheme.canvas,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Column(
@@ -514,16 +525,16 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                   Text(
                     distanceText,
                     style: const TextStyle(
-                      color: AppTheme.navy,
+                      color: AppTheme.ink,
                       fontSize: 17,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   if (data.distanceLabel != null)
                     Text(
                       data.distanceLabel!,
                       style: const TextStyle(
-                        color: Color(0xFF72858D),
+                        color: AppTheme.muted,
                         fontSize: 10.8,
                       ),
                     ),
@@ -535,7 +546,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
           Text(
             data.source,
             style: const TextStyle(
-              color: AppTheme.oceanBlue,
+              color: AppTheme.coralDeep,
               fontSize: 11.3,
               fontWeight: FontWeight.w800,
             ),
@@ -544,7 +555,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
           Text(
             data.sourceNote,
             style: const TextStyle(
-              color: Color(0xFF7B8C93),
+              color: AppTheme.muted,
               fontSize: 10.8,
               height: 1.35,
             ),
@@ -583,7 +594,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
         title: 'Temporary sea conditions',
         headline: 'Live data unavailable',
         body: data.temporaryHazardNote,
-        color: const Color(0xFF7A8B92),
+        color: AppTheme.muted,
       );
     }
 
@@ -605,20 +616,19 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF7E8),
+        color: AppTheme.butter.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, color: AppTheme.warning),
+          const Icon(Icons.info_outline_rounded, color: AppTheme.ink),
           const SizedBox(width: 9),
           Expanded(
             child: Text(
               data.maritimeBoundaryNote,
               style: const TextStyle(
-                color: Color(0xFF6B6047),
+                color: AppTheme.ink,
                 fontSize: 11.2,
                 height: 1.45,
               ),
@@ -641,8 +651,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: const Color(0xFFE0E9ED)),
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -651,7 +660,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
             width: 45,
             height: 45,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.10),
+              color: color.withValues(alpha: 0.13),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: color),
@@ -664,7 +673,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF6C7F87),
+                    color: AppTheme.muted,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
                   ),
@@ -675,14 +684,14 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                   style: TextStyle(
                     color: color,
                     fontSize: 17,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   body,
                   style: const TextStyle(
-                    color: Color(0xFF61747C),
+                    color: AppTheme.muted,
                     fontSize: 12.2,
                     height: 1.4,
                   ),
@@ -692,7 +701,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
                   Text(
                     footer,
                     style: const TextStyle(
-                      color: Color(0xFF819198),
+                      color: AppTheme.muted,
                       fontSize: 10.7,
                       height: 1.35,
                     ),
@@ -712,6 +721,7 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
         color: color,
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 3),
+        boxShadow: AppTheme.softShadow,
       ),
       child: Icon(icon, color: Colors.white, size: 23),
     );
@@ -722,14 +732,20 @@ class _BoundaryGuardianScreenState extends State<BoundaryGuardianScreen> {
     required String tooltip,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      elevation: 2,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: AppTheme.softShadow,
+      ),
       child: IconButton(
         tooltip: tooltip,
         onPressed: onTap,
-        icon: Icon(icon, color: AppTheme.navy),
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: AppTheme.ink,
+          shape: const CircleBorder(),
+        ),
+        icon: Icon(icon),
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/fisherman_models.dart';
 import '../../services/fisherman_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 import '../vessel/vessel_list_screen.dart';
 
 class FishermanProfileScreen extends StatefulWidget {
@@ -106,37 +108,20 @@ class _FishermanProfileScreenState extends State<FishermanProfileScreen> {
   }
 
   InputDecoration _field(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFDCE8EC)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: AppTheme.oceanBlue, width: 1.4),
-      ),
-    );
+    return InputDecoration(labelText: label, prefixIcon: Icon(icon));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F8FA),
-      appBar: AppBar(
-        title: const Text('My ORCA Profile'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      appBar: AppBar(title: const Text('My ORCA Profile')),
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? _errorView()
+            : _content(),
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? _errorView()
-          : _content(),
     );
   }
 
@@ -147,11 +132,7 @@ class _FishermanProfileScreenState extends State<FishermanProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off_rounded,
-              size: 48,
-              color: AppTheme.oceanBlue,
-            ),
+            const OrcaMascot(size: 96, mood: MascotMood.sleepy),
             const SizedBox(height: 14),
             Text(error!, textAlign: TextAlign.center),
             const SizedBox(height: 16),
@@ -174,37 +155,53 @@ class _FishermanProfileScreenState extends State<FishermanProfileScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.navy, AppTheme.oceanBlue],
-              ),
-              borderRadius: BorderRadius.circular(26),
+              color: AppTheme.coral,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                const Icon(
-                  Icons.verified_user_rounded,
-                  color: Colors.white,
-                  size: 32,
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  p.fullName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SoftIcon(
+                        Icons.verified_user_rounded,
+                        color: Colors.white,
+                        background: Colors.white.withValues(alpha: 0.22),
+                        size: 44,
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        p.fullName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.6,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Fisher ID: ${p.fisherId ?? 'Pending'}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        p.phoneNumber ?? 'No phone number',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.88),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Fisher ID: ${p.fisherId ?? 'Pending'}',
-                  style: const TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  p.phoneNumber ?? 'No phone number',
-                  style: const TextStyle(color: Colors.white70),
+                const OrcaMascot(
+                  size: 92,
+                  mood: MascotMood.happy,
+                  color: Colors.white,
                 ),
               ],
             ),
@@ -253,14 +250,8 @@ class _FishermanProfileScreenState extends State<FishermanProfileScreen> {
           SizedBox(
             width: double.infinity,
             height: 56,
-            child: FilledButton(
+            child: ElevatedButton(
               onPressed: saving ? null : _save,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.navy,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ),
               child: saving
                   ? const SizedBox(
                       width: 22,
@@ -270,10 +261,7 @@ class _FishermanProfileScreenState extends State<FishermanProfileScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
-                      'Save Profile',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
+                  : const Text('Save Profile'),
             ),
           ),
           const SizedBox(height: 14),
@@ -297,7 +285,7 @@ class _FishermanProfileScreenState extends State<FishermanProfileScreen> {
             'the map/GPS phase instead of asking you to type '
             'coordinates manually.',
             style: TextStyle(
-              color: Color(0xFF71858E),
+              color: AppTheme.muted,
               fontSize: 12.5,
               height: 1.45,
             ),

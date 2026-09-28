@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/fisherman_models.dart';
 import '../../services/fisherman_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 
 class VesselFormScreen extends StatefulWidget {
   final VesselData? vessel;
@@ -191,50 +193,38 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
       hintText: hint,
       suffixText: suffix,
       prefixIcon: Icon(icon),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: Color(0xFFDCE8EC)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: AppTheme.oceanBlue, width: 1.5),
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FA),
       appBar: AppBar(
         title: Text(editing ? 'Edit Boat' : 'Set Up Your Boat'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         leading: IconButton(
           onPressed: saving ? null : _back,
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            _progressHeader(),
-            Expanded(
-              child: PageView(
-                controller: pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  _stepIdentity(),
-                  _stepTripBasics(),
-                  _stepOptionalDetails(),
-                ],
+      body: GridBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              _progressHeader(),
+              Expanded(
+                child: PageView(
+                  controller: pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _stepIdentity(),
+                    _stepTripBasics(),
+                    _stepOptionalDetails(),
+                  ],
+                ),
               ),
-            ),
-            _bottomBar(),
-          ],
+              _bottomBar(),
+            ],
+          ),
         ),
       ),
     );
@@ -245,22 +235,7 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
       child: Column(
         children: [
-          Row(
-            children: List.generate(3, (index) {
-              return Expanded(
-                child: Container(
-                  height: 5,
-                  margin: EdgeInsets.only(right: index == 2 ? 0 : 7),
-                  decoration: BoxDecoration(
-                    color: index <= step
-                        ? AppTheme.oceanBlue
-                        : const Color(0xFFDCE7EC),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              );
-            }),
-          ),
+          PillProgress(value: (step + 1) / 3),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -268,7 +243,7 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
               Text(
                 'Step ${step + 1} of 3',
                 style: const TextStyle(
-                  color: Color(0xFF72858E),
+                  color: AppTheme.muted,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                 ),
@@ -276,7 +251,7 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
               const Text(
                 'Only add what you know',
                 style: TextStyle(
-                  color: AppTheme.oceanBlue,
+                  color: AppTheme.coralDeep,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                 ),
@@ -299,30 +274,42 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: AppTheme.oceanBlue.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Icon(icon, color: AppTheme.oceanBlue, size: 29),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              SoftIcon(
+                icon,
+                color: AppTheme.coralDeep,
+                background: AppTheme.coralSoft,
+                size: 56,
+              ),
+              const Spacer(),
+              OrcaMascot(
+                size: 72,
+                mood: const [
+                  MascotMood.happy,
+                  MascotMood.calm,
+                  MascotMood.sparkle,
+                ][step.clamp(0, 2)],
+              ),
+            ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           Text(
             title,
             style: const TextStyle(
-              color: AppTheme.navy,
-              fontSize: 26,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.4,
+              color: AppTheme.ink,
+              fontSize: 27,
+              height: 1.12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.8,
             ),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 8),
           Text(
             subtitle,
             style: const TextStyle(
-              color: Color(0xFF687D87),
+              color: AppTheme.muted,
               fontSize: 13.5,
               height: 1.45,
             ),
@@ -366,9 +353,10 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
         const Text(
           'Boat type',
           style: TextStyle(
-            color: AppTheme.navy,
+            color: AppTheme.ink,
             fontSize: 16,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
           ),
         ),
         const SizedBox(height: 10),
@@ -426,9 +414,10 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
         const Text(
           'Do you know the usual cruising speed?',
           style: TextStyle(
-            color: AppTheme.navy,
+            color: AppTheme.ink,
             fontSize: 16,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
           ),
         ),
         const SizedBox(height: 10),
@@ -473,24 +462,25 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
         Container(
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: const Color(0xFFEAF7F4),
-            borderRadius: BorderRadius.circular(18),
+            color: AppTheme.limeSoft,
+            borderRadius: BorderRadius.circular(AppTheme.radius + 2),
           ),
           child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
+              SoftIcon(
                 Icons.info_outline_rounded,
-                color: AppTheme.oceanBlue,
-                size: 21,
+                color: AppTheme.ink,
+                background: AppTheme.lime,
+                size: 34,
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'If you do not know the speed, leave it unknown. '
                   'ORCA will ask for it only when a feature really needs an accurate ETA.',
                   style: TextStyle(
-                    color: Color(0xFF537078),
+                    color: AppTheme.charcoal,
                     fontSize: 12.5,
                     height: 1.45,
                   ),
@@ -508,24 +498,25 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
     required bool selected,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(17),
-      onTap: saving ? null : onTap,
-      child: Container(
-        height: 54,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? AppTheme.navy : Colors.white,
-          borderRadius: BorderRadius.circular(17),
-          border: Border.all(
-            color: selected ? AppTheme.navy : const Color(0xFFDCE8EC),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        onTap: saving ? null : onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: 54,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? AppTheme.coral : Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radius),
           ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.white : AppTheme.navy,
-            fontWeight: FontWeight.w700,
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.white : AppTheme.ink,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -563,21 +554,25 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFDCE8EC)),
+            color: AppTheme.lavenderSoft,
+            borderRadius: BorderRadius.circular(AppTheme.radius + 2),
           ),
           child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.photo_camera_outlined, color: AppTheme.oceanBlue),
-              SizedBox(width: 11),
+              SoftIcon(
+                Icons.photo_camera_outlined,
+                color: AppTheme.indigo,
+                background: Colors.white,
+                size: 34,
+              ),
+              SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Next improvement: scan the boat registration certificate '
                   'and let ORCA pre-fill known details for confirmation.',
                   style: TextStyle(
-                    color: Color(0xFF667B84),
+                    color: AppTheme.charcoal,
                     fontSize: 12.5,
                     height: 1.45,
                   ),
@@ -595,7 +590,9 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE4ECEF))),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusLg),
+        ),
       ),
       child: Row(
         children: [
@@ -612,10 +609,9 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
           if (step > 0) const SizedBox(width: 10),
           Expanded(
             flex: 2,
-            child: FilledButton(
+            child: ElevatedButton(
               onPressed: saving ? null : _next,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.navy,
+              style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(54),
               ),
               child: saving
@@ -631,7 +627,6 @@ class _VesselFormScreenState extends State<VesselFormScreen> {
                       step == 2
                           ? (editing ? 'Save Boat' : 'Finish Setup')
                           : 'Continue',
-                      style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
             ),
           ),

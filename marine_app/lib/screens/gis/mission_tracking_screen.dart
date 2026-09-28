@@ -9,6 +9,8 @@ import 'package:latlong2/latlong.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/gis_models.dart';
 import '../../services/gis_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 
 class MissionTrackingScreen extends StatefulWidget {
   final RouteAlternativeData route;
@@ -303,34 +305,60 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FA),
       appBar: AppBar(
         title: const Text('Mission Tracking'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         actions: [
-          TextButton(
-            onPressed: _stopMission,
-            child: const Text(
-              'STOP',
-              style: TextStyle(
-                color: AppTheme.danger,
-                fontWeight: FontWeight.w900,
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: TextButton(
+              onPressed: _stopMission,
+              style: TextButton.styleFrom(
+                backgroundColor: AppTheme.danger.withValues(alpha: 0.12),
+                foregroundColor: AppTheme.danger,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: const Text(
+                'STOP',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
           ),
         ],
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(error!, textAlign: TextAlign.center),
-              ),
-            )
-          : _content(),
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const OrcaMascot(
+                        size: 104,
+                        mood: MascotMood.sleepy,
+                        halo: true,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppTheme.muted,
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : _content(),
+      ),
     );
   }
 
@@ -364,8 +392,8 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
           height: 360,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFDCE8EC)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
           ),
           child: FlutterMap(
             mapController: mapController,
@@ -380,13 +408,15 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
                   Polyline(
                     points: routePoints,
                     strokeWidth: 5,
-                    color: AppTheme.oceanBlue,
+                    color: AppTheme.coral,
+                    borderStrokeWidth: 2,
+                    borderColor: Colors.white,
                   ),
                   if (track.length > 1)
                     Polyline(
                       points: track,
                       strokeWidth: 4,
-                      color: AppTheme.success,
+                      color: AppTheme.indigo,
                     ),
                 ],
               ),
@@ -398,9 +428,10 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
                     height: 50,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppTheme.success,
+                        color: AppTheme.coral,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 4),
+                        boxShadow: AppTheme.softShadow,
                       ),
                       child: const Icon(
                         Icons.navigation_rounded,
@@ -413,40 +444,68 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 14),
         Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppTheme.navy,
-            borderRadius: BorderRadius.circular(22),
+            color: AppTheme.coral,
+            borderRadius: BorderRadius.circular(28),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              const Text(
-                'NEXT WAYPOINT',
-                style: TextStyle(
-                  color: Colors.white60,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Text(
+                        'NEXT WAYPOINT',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${bearingToNext.toStringAsFixed(0)}° • '
+                      '${_haversineKm(here, LatLng(next.latitude, next.longitude)).toStringAsFixed(1)} km',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Waypoint ${nextWaypointIndex + 1} of '
+                      '${widget.route.waypoints.length}',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.88),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 7),
-              Text(
-                '${bearingToNext.toStringAsFixed(0)}° • '
-                '${_haversineKm(here, LatLng(next.latitude, next.longitude)).toStringAsFixed(1)} km',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
+              Transform.rotate(
+                angle: bearingToNext * math.pi / 180,
+                child: const SoftIcon(
+                  Icons.navigation_rounded,
+                  color: AppTheme.coralDeep,
+                  background: Colors.white,
+                  size: 56,
                 ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Waypoint ${nextWaypointIndex + 1} of '
-                '${widget.route.waypoints.length}',
-                style: const TextStyle(color: Colors.white70),
               ),
             ],
           ),
@@ -458,15 +517,25 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
               child: _metric(
                 'Remaining',
                 '${remainingNm.toStringAsFixed(1)} nm',
+                Colors.white,
               ),
             ),
             const SizedBox(width: 10),
-            Expanded(child: _metric('Updated ETA', _etaText())),
+            Expanded(
+              child: _metric(
+                'Updated ETA',
+                _etaText(),
+                AppTheme.lavenderSoft,
+              ),
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: _metric(
                 'Off route',
                 '${crossTrackNm.toStringAsFixed(2)} nm',
+                routeDeviation
+                    ? AppTheme.danger.withValues(alpha: 0.12)
+                    : AppTheme.limeSoft,
               ),
             ),
           ],
@@ -475,6 +544,7 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
         _metric(
           'Live / planned speed',
           '${liveSpeedKnots.toStringAsFixed(1)} kn',
+          Colors.white,
         ),
         const SizedBox(height: 12),
         _conditionCard(next.condition),
@@ -487,27 +557,37 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_rounded, color: color),
-          const SizedBox(width: 10),
+          SoftIcon(
+            Icons.warning_rounded,
+            color: Colors.white,
+            background: color,
+            size: 42,
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(color: color, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.4,
+                  ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   body,
                   style: const TextStyle(
-                    color: Color(0xFF5E727B),
+                    color: AppTheme.ink,
                     fontSize: 12.5,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -518,29 +598,33 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
     );
   }
 
-  Widget _metric(String label, String value) {
+  Widget _metric(String label, String value, Color background) {
     return Container(
-      padding: const EdgeInsets.all(13),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: const Color(0xFFE1EAED)),
+        color: background,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppTheme.navy,
-              fontSize: 15,
-              fontWeight: FontWeight.w900,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppTheme.ink,
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
           const SizedBox(height: 3),
           Text(
             label,
-            style: const TextStyle(color: Color(0xFF788A92), fontSize: 10.5),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppTheme.muted, fontSize: 11),
           ),
         ],
       ),
@@ -554,29 +638,43 @@ class _MissionTrackingScreenState extends State<MissionTrackingScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(17),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE1EAED)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Conditions near next waypoint',
-            style: TextStyle(
-              color: AppTheme.navy,
-              fontWeight: FontWeight.w900,
-              fontSize: 16,
-            ),
+          const SoftIcon(
+            Icons.waves_rounded,
+            color: AppTheme.coralDeep,
+            background: AppTheme.coralSoft,
+            size: 42,
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Waves ${v(c.waveHeightM, 'm')} • '
-            'Wind ${v(c.windSpeedMs, 'm/s')} • '
-            'Current ${v(c.currentVelocityMs, 'm/s')}',
-            style: const TextStyle(color: Color(0xFF62767E), height: 1.45),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Conditions near next waypoint',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Waves ${v(c.waveHeightM, 'm')} • '
+                  'Wind ${v(c.windSpeedMs, 'm/s')} • '
+                  'Current ${v(c.currentVelocityMs, 'm/s')}',
+                  style: const TextStyle(color: AppTheme.muted, height: 1.45),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_theme.dart';
+import '../widgets/orca_mascot.dart';
+import '../widgets/talkie_ui.dart';
 import 'landing_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,12 +14,19 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   Timer? _timer;
+  late final AnimationController _bounce;
 
   @override
   void initState() {
     super.initState();
+
+    _bounce = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
 
     _timer = Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
@@ -31,86 +41,62 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _bounce.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF061B2C), Color(0xFF073B4C), Color(0xFF087EA4)],
-          ),
-        ),
+      body: GridBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              const Spacer(),
-
-              Container(
-                width: 112,
-                height: 112,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(32),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                const Spacer(flex: 3),
+                AnimatedBuilder(
+                  animation: _bounce,
+                  builder: (_, child) => Transform.translate(
+                    offset: Offset(
+                      0,
+                      -10 * Curves.easeInOut.transform(_bounce.value),
+                    ),
+                    child: child,
+                  ),
+                  child: const OrcaMascot(size: 150),
+                ),
+                const SizedBox(height: 26),
+                const Text(
+                  'ORCA',
+                  style: TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 52,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1.5,
+                    height: 1,
                   ),
                 ),
-                child: const Icon(
-                  Icons.waves_rounded,
-                  color: Colors.white,
-                  size: 64,
+                const SizedBox(height: 14),
+                const StickerLabel('MARINE INTELLIGENCE', angle: -4),
+                const Spacer(flex: 3),
+                const SizedBox(
+                  width: 120,
+                  child: LinearProgressIndicator(
+                    minHeight: 6,
+                    color: AppTheme.coral,
+                    backgroundColor: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(6)),
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 28),
-
-              const Text(
-                'ORCA',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 44,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 6,
+                const SizedBox(height: 18),
+                const Text(
+                  'Intelligence that travels with you.',
+                  style: TextStyle(color: AppTheme.muted, fontSize: 13.5),
                 ),
-              ),
-
-              const SizedBox(height: 10),
-
-              const Text(
-                'Marine Intelligence Platform',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  letterSpacing: 0.4,
-                ),
-              ),
-
-              const Spacer(),
-
-              const SizedBox(
-                width: 26,
-                height: 26,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Text(
-                'Intelligence that travels with you.',
-                style: TextStyle(color: Colors.white60, fontSize: 13),
-              ),
-
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 36),
+              ],
+            ),
           ),
         ),
       ),

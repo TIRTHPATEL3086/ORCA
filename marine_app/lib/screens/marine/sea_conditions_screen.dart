@@ -6,6 +6,8 @@ import 'package:latlong2/latlong.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/marine_conditions.dart';
 import '../../services/marine_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 
 class SeaConditionsScreen extends StatefulWidget {
   const SeaConditionsScreen({super.key});
@@ -97,7 +99,7 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
       case 'HIGH':
         return AppTheme.danger;
       default:
-        return const Color(0xFF7A8B92);
+        return AppTheme.muted;
     }
   }
 
@@ -110,23 +112,26 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F8FA),
       appBar: AppBar(
         title: const Text('Sea Conditions'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
         actions: [
-          IconButton(
-            onPressed: loading ? null : _load,
-            icon: const Icon(Icons.refresh_rounded),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              style: IconButton.styleFrom(backgroundColor: Colors.white),
+              onPressed: loading ? null : _load,
+              icon: const Icon(Icons.refresh_rounded),
+            ),
           ),
         ],
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? _errorView()
-          : _content(),
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? _errorView()
+            : _content(),
+      ),
     );
   }
 
@@ -137,18 +142,14 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off_rounded,
-              size: 52,
-              color: AppTheme.oceanBlue,
-            ),
-            const SizedBox(height: 16),
+            const OrcaMascot(size: 110, mood: MascotMood.sleepy, halo: true),
+            const SizedBox(height: 18),
             Text(
               error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFF5E727B), height: 1.45),
+              style: const TextStyle(color: AppTheme.muted, height: 1.45),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: _load,
               icon: const Icon(Icons.refresh_rounded),
@@ -169,45 +170,45 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 8, 18, 30),
         children: [
-          _mapCard(p.latitude, p.longitude),
-          const SizedBox(height: 16),
           _screeningCard(d),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
+          _mapCard(p.latitude, p.longitude),
+          const SizedBox(height: 22),
           const Text(
             'Live marine conditions',
             style: TextStyle(
-              color: AppTheme.navy,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+              color: AppTheme.ink,
+              fontSize: 21,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 11),
+          const SizedBox(height: 12),
           _grid(d),
           const SizedBox(height: 18),
           _evidenceCard(d),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF7E8),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppTheme.warning.withValues(alpha: 0.35),
-              ),
+              color: AppTheme.butter.withValues(alpha: 0.55),
+              borderRadius: BorderRadius.circular(22),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                const SoftIcon(
                   Icons.warning_amber_rounded,
-                  color: AppTheme.warning,
+                  color: AppTheme.ink,
+                  background: Colors.white,
+                  size: 38,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     d.navigationNotice,
                     style: const TextStyle(
-                      color: Color(0xFF6B6047),
+                      color: AppTheme.ink,
                       fontSize: 12.5,
                       height: 1.45,
                     ),
@@ -225,11 +226,11 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
     final point = LatLng(latitude, longitude);
 
     return Container(
-      height: 260,
+      height: 240,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0xFFDCE8EC)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       ),
       child: Stack(
         children: [
@@ -248,15 +249,10 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
                     height: 50,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppTheme.oceanBlue,
+                        color: AppTheme.coral,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.16),
-                            blurRadius: 12,
-                          ),
-                        ],
+                        boxShadow: AppTheme.softShadow,
                       ),
                       child: const Icon(
                         Icons.navigation_rounded,
@@ -275,17 +271,29 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.94),
-                borderRadius: BorderRadius.circular(14),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: AppTheme.softShadow,
               ),
-              child: Text(
-                '${latitude.toStringAsFixed(4)}, '
-                '${longitude.toStringAsFixed(4)}',
-                style: const TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.my_location_rounded,
+                    size: 14,
+                    color: AppTheme.coralDeep,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${latitude.toStringAsFixed(4)}, '
+                    '${longitude.toStringAsFixed(4)}',
+                    style: const TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -298,49 +306,65 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
     final color = _statusColor(d.screeningStatus);
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: color.withValues(alpha: 0.28)),
+        color: AppTheme.coral,
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(Icons.shield_outlined, color: Colors.white),
-          ),
-          const SizedBox(width: 13),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Prototype screening: '
-                  '${d.screeningStatus}',
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.shield_rounded, color: color, size: 16),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Prototype screening: '
+                          '${d.screeningStatus}',
+                          style: TextStyle(
+                            color: color,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 14),
                 Text(
                   d.screeningReason,
                   style: const TextStyle(
-                    color: Color(0xFF61747C),
-                    fontSize: 12.5,
-                    height: 1.45,
+                    color: Colors.white,
+                    fontSize: 15,
+                    height: 1.4,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ],
             ),
+          ),
+          const SizedBox(width: 8),
+          const OrcaMascot(
+            size: 72,
+            mood: MascotMood.happy,
+            color: Colors.white,
           ),
         ],
       ),
@@ -371,45 +395,72 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
       ),
     ];
 
+    const tiles = [
+      Colors.white,
+      AppTheme.lavenderSoft,
+      AppTheme.limeSoft,
+      Colors.white,
+    ];
+    const iconTints = [
+      AppTheme.coralDeep,
+      AppTheme.indigo,
+      AppTheme.sageDeep,
+      AppTheme.coralDeep,
+    ];
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 11,
-        mainAxisSpacing: 11,
-        childAspectRatio: 1.42,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.3,
       ),
       itemBuilder: (_, index) {
         final item = items[index];
+        final tile = tiles[index % tiles.length];
+        final tint = iconTints[index % iconTints.length];
 
         return Container(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE0E9ED)),
+            color: tile,
+            borderRadius: BorderRadius.circular(22),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(item.$3, color: AppTheme.oceanBlue, size: 23),
+              SoftIcon(
+                item.$3,
+                color: tint,
+                background: tile == Colors.white
+                    ? AppTheme.coralSoft
+                    : Colors.white,
+                size: 36,
+              ),
               const Spacer(),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  item.$2,
+                  style: const TextStyle(
+                    color: AppTheme.ink,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
               Text(
                 item.$1,
                 style: const TextStyle(
-                  color: Color(0xFF71838B),
+                  color: AppTheme.muted,
                   fontSize: 11.5,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                item.$2,
-                style: const TextStyle(
-                  color: AppTheme.navy,
-                  fontSize: 15.5,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -424,38 +475,49 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE0E9ED)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
-              Icon(Icons.fact_check_outlined, color: AppTheme.oceanBlue),
-              SizedBox(width: 9),
+              SoftIcon(
+                Icons.fact_check_outlined,
+                color: AppTheme.indigo,
+                background: AppTheme.lavenderSoft,
+                size: 38,
+              ),
+              SizedBox(width: 11),
               Text(
                 'Evidence & freshness',
                 style: TextStyle(
-                  color: AppTheme.navy,
+                  color: AppTheme.ink,
                   fontSize: 17,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
           ...d.evidence.map(
-            (e) => Padding(
-              padding: const EdgeInsets.only(bottom: 13),
+            (e) => Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.canvas,
+                borderRadius: BorderRadius.circular(AppTheme.radius),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     e.source,
                     style: const TextStyle(
-                      color: AppTheme.navy,
-                      fontWeight: FontWeight.w800,
+                      color: AppTheme.ink,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -464,7 +526,7 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
                         ? e.freshnessLabel
                         : '${e.freshnessLabel} • ${e.modelTime}',
                     style: const TextStyle(
-                      color: Color(0xFF6F828A),
+                      color: AppTheme.muted,
                       fontSize: 12,
                     ),
                   ),
@@ -473,7 +535,7 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
                     Text(
                       e.note!,
                       style: const TextStyle(
-                        color: Color(0xFF829199),
+                        color: AppTheme.muted,
                         fontSize: 11.5,
                         height: 1.35,
                       ),
@@ -483,11 +545,12 @@ class _SeaConditionsScreenState extends State<SeaConditionsScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 4),
           Text(
             'Official India reference: '
             '${d.officialIndiaReference}',
             style: const TextStyle(
-              color: AppTheme.oceanBlue,
+              color: AppTheme.coralDeep,
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
             ),

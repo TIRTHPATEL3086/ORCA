@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/fisherman_models.dart';
 import '../../services/fisherman_service.dart';
+import '../../widgets/orca_mascot.dart';
+import '../../widgets/talkie_ui.dart';
 import 'vessel_form_screen.dart';
 
 class VesselListScreen extends StatefulWidget {
@@ -97,36 +99,39 @@ class _VesselListScreenState extends State<VesselListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F8FA),
-      appBar: AppBar(
-        title: const Text('My Vessels'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('My Vessels')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openForm(),
-        backgroundColor: AppTheme.navy,
+        backgroundColor: AppTheme.charcoal,
         foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radius),
+        ),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Vessel'),
+        label: const Text(
+          'Add Vessel',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
       ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
-          ? _errorView()
-          : vessels.isEmpty
-          ? _emptyView()
-          : RefreshIndicator(
-              onRefresh: _load,
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 110),
-                itemCount: vessels.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  return _vesselCard(vessels[index]);
-                },
+      body: GridBackground(
+        child: loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? _errorView()
+            : vessels.isEmpty
+            ? _emptyView()
+            : RefreshIndicator(
+                onRefresh: _load,
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 110),
+                  itemCount: vessels.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    return _vesselCard(vessels[index]);
+                  },
+                ),
               ),
-            ),
+      ),
     );
   }
 
@@ -137,11 +142,7 @@ class _VesselListScreenState extends State<VesselListScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline_rounded,
-              size: 46,
-              color: AppTheme.oceanBlue,
-            ),
+            const OrcaMascot(size: 96, mood: MascotMood.sleepy),
             const SizedBox(height: 12),
             Text(error!, textAlign: TextAlign.center),
             const SizedBox(height: 16),
@@ -159,18 +160,15 @@ class _VesselListScreenState extends State<VesselListScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.sailing_rounded,
-              size: 58,
-              color: AppTheme.oceanBlue,
-            ),
-            const SizedBox(height: 16),
+            const OrcaMascot(size: 120, mood: MascotMood.calm, halo: true),
+            const SizedBox(height: 18),
             const Text(
               'No vessel added yet',
               style: TextStyle(
-                color: AppTheme.navy,
-                fontSize: 21,
+                color: AppTheme.ink,
+                fontSize: 24,
                 fontWeight: FontWeight.w800,
+                letterSpacing: -0.6,
               ),
             ),
             const SizedBox(height: 8),
@@ -179,9 +177,9 @@ class _VesselListScreenState extends State<VesselListScreen> {
               'speed, dimensions and usual persons onboard '
               'for future trip planning and safety workflows.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF687D87), height: 1.45),
+              style: TextStyle(color: AppTheme.muted, height: 1.5),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             FilledButton.icon(
               onPressed: () => _openForm(),
               icon: const Icon(Icons.add_rounded),
@@ -202,23 +200,19 @@ class _VesselListScreenState extends State<VesselListScreen> {
     ].join(' • ');
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFDDE8EC)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg - 2),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppTheme.oceanBlue.withValues(alpha: 0.09),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(Icons.sailing_rounded, color: AppTheme.oceanBlue),
+          const SoftIcon(
+            Icons.sailing_rounded,
+            color: AppTheme.coralDeep,
+            background: AppTheme.coralSoft,
+            size: 52,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -228,24 +222,39 @@ class _VesselListScreenState extends State<VesselListScreen> {
                 Text(
                   vessel.name,
                   style: const TextStyle(
-                    color: AppTheme.navy,
+                    color: AppTheme.ink,
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3,
                   ),
                 ),
                 if (vessel.registrationNumber != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    vessel.registrationNumber!,
-                    style: const TextStyle(color: Color(0xFF6E828C)),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.lavenderSoft,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      vessel.registrationNumber!,
+                      style: const TextStyle(
+                        color: AppTheme.indigo,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ],
                 if (details.isNotEmpty) ...[
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 8),
                   Text(
                     details,
                     style: const TextStyle(
-                      color: Color(0xFF6E828C),
+                      color: AppTheme.muted,
                       fontSize: 12.5,
                     ),
                   ),
@@ -256,11 +265,17 @@ class _VesselListScreenState extends State<VesselListScreen> {
                   children: [
                     TextButton.icon(
                       onPressed: () => _openForm(vessel),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppTheme.charcoal,
+                      ),
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       label: const Text('Edit'),
                     ),
                     TextButton.icon(
                       onPressed: () => _delete(vessel),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppTheme.danger,
+                      ),
                       icon: const Icon(Icons.delete_outline_rounded, size: 18),
                       label: const Text('Delete'),
                     ),
