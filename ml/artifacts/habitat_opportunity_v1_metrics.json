@@ -1,0 +1,66 @@
+{
+  "model_selected": "hist_gradient_boosting",
+  "validation_metrics": {
+    "logistic_regression": {
+      "roc_auc": 0.6150617283950617,
+      "pr_auc": 0.43292201618013415,
+      "balanced_accuracy": 0.5444444444444445,
+      "precision": 0.36,
+      "recall": 0.8,
+      "f1": 0.496551724137931,
+      "brier": 0.46601591789744196
+    },
+    "random_forest": {
+      "roc_auc": 0.5288888888888889,
+      "pr_auc": 0.4427673696536278,
+      "balanced_accuracy": 0.5111111111111111,
+      "precision": 1.0,
+      "recall": 0.022222222222222223,
+      "f1": 0.043478260869565216,
+      "brier": 0.24917348703493722
+    },
+    "hist_gradient_boosting": {
+      "roc_auc": 0.5590123456790124,
+      "pr_auc": 0.46974892916467437,
+      "balanced_accuracy": 0.5444444444444444,
+      "precision": 1.0,
+      "recall": 0.08888888888888889,
+      "f1": 0.16326530612244897,
+      "brier": 0.297833551339783
+    }
+  },
+  "independent_temporal_test_metrics": {
+    "roc_auc": 0.6712962962962963,
+    "pr_auc": 0.48716124809153327,
+    "balanced_accuracy": 0.6111111111111112,
+    "precision": 0.5757575757575758,
+    "recall": 0.35185185185185186,
+    "f1": 0.4367816091954023,
+    "brier": 0.23162339752231417
+  },
+  "sample_counts": {
+    "train_2011_2014": 495,
+    "validation_2015": 135,
+    "test_2016_2018": 162,
+    "total": 792
+  },
+  "feature_completeness": {
+    "depth_m": 1.0,
+    "bathy_slope_m_per_km": 1.0,
+    "month_sin": 1.0,
+    "month_cos": 1.0,
+    "doy_sin": 1.0,
+    "doy_cos": 1.0,
+    "sst_c": 1.0,
+    "sst_anom_c": 1.0,
+    "sst_error_c": 1.0,
+    "sst_local_range_c": 1.0,
+    "chl_mg_m3": 0.9002525252525253,
+    "log_chl": 0.9002525252525253,
+    "chl_local_range": 0.851010101010101,
+    "wind_speed_ms": 0.9962121212121212,
+    "eastward_wind_ms": 0.9962121212121212,
+    "northward_wind_ms": 0.9962121212121212
+  },
+  "important_interpretation": "These metrics measure discrimination between documented fish occurrences and controlled background samples. They are not official PFZ accuracy and should not be described that way."
+}

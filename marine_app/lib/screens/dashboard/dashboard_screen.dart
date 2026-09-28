@@ -9,6 +9,7 @@ import '../../widgets/feature_card.dart';
 import '../../widgets/marine_status_card.dart';
 import '../profile/fisherman_profile_screen.dart';
 import '../marine/sea_conditions_screen.dart';
+import '../orca/ask_orca_screen.dart';
 import '../splash_screen.dart';
 import '../vessel/vessel_form_screen.dart';
 import '../vessel/vessel_list_screen.dart';
@@ -377,7 +378,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _assistantCard(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(24),
-      onTap: () => comingSoon(context, 'ORCA Assistant'),
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const AskOrcaScreen()));
+      },
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

@@ -1,0 +1,4 @@
+# ORCA Phase 12 local ML data
+data/raw/
+data/cache/
+data/processed/*.csv
