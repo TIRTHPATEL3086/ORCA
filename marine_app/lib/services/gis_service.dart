@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
+
 import '../models/gis_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
@@ -11,7 +13,7 @@ import 'session_service.dart';
 class GisService {
   GisService._();
 
-  static const String _baseUrl = 'http://127.0.0.1:8000/api/v1/gis';
+  static const String _baseUrl = '${ApiConfig.apiV1}/gis';
 
   static Future<Map<String, String>> _headers() async {
     final token = await SessionService.getAccessToken();

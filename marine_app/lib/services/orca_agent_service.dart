@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
+
 import '../models/orca_agent_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
@@ -11,7 +13,7 @@ import 'session_service.dart';
 class OrcaAgentService {
   OrcaAgentService._();
 
-  static const String _endpoint = 'http://127.0.0.1:8000/api/v1/orca/query';
+  static const String _endpoint = '${ApiConfig.apiV1}/orca/query';
 
   static Future<OrcaAgentResponseData> query({
     required String message,

@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
+
 import '../models/fisherman_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
@@ -11,7 +13,7 @@ import 'session_service.dart';
 class FishermanService {
   FishermanService._();
 
-  static const String _baseUrl = 'http://127.0.0.1:8000/api/v1/fisherman';
+  static const String _baseUrl = '${ApiConfig.apiV1}/fisherman';
 
   static Future<Map<String, String>> _headers() async {
     final token = await SessionService.getAccessToken();

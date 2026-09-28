@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
+
 import '../models/auth_models.dart';
 
 class ApiException implements Exception {
@@ -17,7 +19,7 @@ class ApiException implements Exception {
 class AuthService {
   AuthService._();
 
-  static const String _baseUrl = 'http://127.0.0.1:8000/api/v1/auth';
+  static const String _baseUrl = '${ApiConfig.apiV1}/auth';
 
   static const Map<String, String> _headers = {
     'Content-Type': 'application/json',

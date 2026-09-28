@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
+
 import '../models/auth_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
@@ -9,7 +11,7 @@ import 'session_service.dart';
 class SessionValidationService {
   SessionValidationService._();
 
-  static const String _meUrl = 'http://127.0.0.1:8000/api/v1/auth/me';
+  static const String _meUrl = '${ApiConfig.apiV1}/auth/me';
 
   static Future<AuthenticatedUser> getCurrentUser() async {
     final token = await SessionService.getAccessToken();

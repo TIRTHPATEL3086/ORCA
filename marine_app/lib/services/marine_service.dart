@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
+import '../core/api_config.dart';
+
 import '../models/marine_conditions.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
@@ -11,7 +13,7 @@ import 'session_service.dart';
 class MarineService {
   MarineService._();
 
-  static const String _baseUrl = 'http://127.0.0.1:8000/api/v1/marine';
+  static const String _baseUrl = '${ApiConfig.apiV1}/marine';
 
   static Future<MarineConditionsData> getConditions({
     required double latitude,
