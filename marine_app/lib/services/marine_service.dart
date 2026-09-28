@@ -9,6 +9,7 @@ import '../core/api_config.dart';
 import '../models/marine_conditions.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
+import 'api_client.dart';
 
 class MarineService {
   MarineService._();
@@ -36,7 +37,7 @@ class MarineService {
     );
 
     try {
-      final response = await http
+      final response = await ApiClient.instance
           .get(
             uri,
             headers: {

@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 
 from app.database import Base, engine
-from app.models import FishermanProfile, User, Vessel
+from app.models import FishermanProfile, RefreshToken, User, Vessel
 
 
 config = context.config

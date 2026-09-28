@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 
 import '../core/api_config.dart';
 
 import '../models/auth_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
+import 'api_client.dart';
 
 class SessionValidationService {
   SessionValidationService._();
@@ -23,7 +23,7 @@ class SessionValidationService {
       );
     }
 
-    final response = await http
+    final response = await ApiClient.instance
         .get(
           Uri.parse(_meUrl),
           headers: {

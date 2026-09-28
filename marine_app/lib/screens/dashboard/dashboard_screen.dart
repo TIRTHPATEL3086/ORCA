@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/user_role.dart';
 import '../../data/orca_l10n.dart';
 import '../../services/fisherman_service.dart';
+import '../../services/auth_service.dart';
 import '../../services/session_service.dart';
 import '../../widgets/feature_card.dart';
 import '../../widgets/marine_status_card.dart';
@@ -119,7 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (yes != true) return;
 
-    await SessionService.clear();
+    await AuthService.logout();
     if (!context.mounted) return;
 
     Navigator.of(context).pushAndRemoveUntil(

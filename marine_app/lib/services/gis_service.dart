@@ -9,6 +9,7 @@ import '../core/api_config.dart';
 import '../models/gis_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
+import 'api_client.dart';
 
 class GisService {
   GisService._();
@@ -56,7 +57,7 @@ class GisService {
 
   static Future<List<BoundaryZoneData>> getZones() {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .get(Uri.parse('$_baseUrl/zones'), headers: await _headers())
           .timeout(ApiConfig.requestTimeout);
 
@@ -88,7 +89,7 @@ class GisService {
         },
       );
 
-      final response = await http
+      final response = await ApiClient.instance
           .get(uri, headers: await _headers())
           .timeout(ApiConfig.requestTimeout);
 
@@ -104,7 +105,7 @@ class GisService {
     required double cruisingSpeedKnots,
   }) {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .post(
             Uri.parse('$_baseUrl/route/plan'),
             headers: await _headers(),

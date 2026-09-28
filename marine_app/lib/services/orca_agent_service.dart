@@ -9,6 +9,7 @@ import '../core/api_config.dart';
 import '../models/orca_agent_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
+import 'api_client.dart';
 
 class OrcaAgentService {
   OrcaAgentService._();
@@ -39,7 +40,7 @@ class OrcaAgentService {
           ? history.sublist(history.length - 20)
           : history;
 
-      final response = await http
+      final response = await ApiClient.instance
           .post(
             Uri.parse(_endpoint),
             headers: {

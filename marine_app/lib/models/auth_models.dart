@@ -59,12 +59,14 @@ class OtpRequestResult {
 class OtpVerifyResult {
   final bool isNewUser;
   final String? accessToken;
+  final String? refreshToken;
   final String? onboardingToken;
   final AuthenticatedUser? user;
 
   const OtpVerifyResult({
     required this.isNewUser,
     required this.accessToken,
+    required this.refreshToken,
     required this.onboardingToken,
     required this.user,
   });
@@ -74,6 +76,7 @@ class OtpVerifyResult {
     return OtpVerifyResult(
       isNewUser: json['is_new_user'] as bool,
       accessToken: json['access_token'] as String?,
+      refreshToken: json['refresh_token'] as String?,
       onboardingToken: json['onboarding_token'] as String?,
       user: rawUser is Map<String, dynamic>
           ? AuthenticatedUser.fromJson(rawUser)
@@ -84,11 +87,13 @@ class OtpVerifyResult {
 
 class AuthResult {
   final String accessToken;
+  final String? refreshToken;
   final String tokenType;
   final AuthenticatedUser user;
 
   const AuthResult({
     required this.accessToken,
+    this.refreshToken,
     required this.tokenType,
     required this.user,
   });
@@ -96,6 +101,7 @@ class AuthResult {
   factory AuthResult.fromJson(Map<String, dynamic> json) {
     return AuthResult(
       accessToken: json['access_token'] as String,
+      refreshToken: json['refresh_token'] as String?,
       tokenType: json['token_type'] as String? ?? 'bearer',
       user: AuthenticatedUser.fromJson(json['user'] as Map<String, dynamic>),
     );

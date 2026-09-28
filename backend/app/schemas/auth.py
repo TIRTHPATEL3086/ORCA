@@ -100,8 +100,13 @@ class UserResponse(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
+    refresh_token: str | None = None
     token_type: str = "bearer"
     user: UserResponse
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str = Field(min_length=20, max_length=200)
 
 
 class OTPRequestResponse(BaseModel):
@@ -114,6 +119,7 @@ class OTPVerifyResponse(BaseModel):
     is_new_user: bool
 
     access_token: str | None = None
+    refresh_token: str | None = None
     onboarding_token: str | None = None
 
     user: UserResponse | None = None

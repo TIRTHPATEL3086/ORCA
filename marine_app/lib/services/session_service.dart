@@ -8,6 +8,7 @@ class SessionService {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   static const _accessTokenKey = 'orca_access_token';
+  static const _refreshTokenKey = 'orca_refresh_token';
   static const _roleKey = 'orca_role';
   static const _userIdKey = 'orca_user_id';
   static const _fisherIdKey = 'orca_fisher_id';
@@ -15,9 +16,10 @@ class SessionService {
 
   static Future<void> saveSession({
     required String accessToken,
+    required String? refreshToken,
     required AuthenticatedUser user,
   }) async {
-    await _storage.write(key: _accessTokenKey, value: accessToken);
+    await saveTokens(accessToken: accessToken, refreshToken: refreshToken);
 
     await _storage.write(key: _roleKey, value: user.role);
 
@@ -35,8 +37,23 @@ class SessionService {
     );
   }
 
+  /// Stores the current token pair (refresh tokens rotate on every use).
+  static Future<void> saveTokens({
+    required String accessToken,
+    required String? refreshToken,
+  }) async {
+    await _storage.write(key: _accessTokenKey, value: accessToken);
+    if (refreshToken != null) {
+      await _storage.write(key: _refreshTokenKey, value: refreshToken);
+    }
+  }
+
   static Future<String?> getAccessToken() {
     return _storage.read(key: _accessTokenKey);
+  }
+
+  static Future<String?> getRefreshToken() {
+    return _storage.read(key: _refreshTokenKey);
   }
 
   static Future<String?> getRole() {
@@ -64,6 +81,7 @@ class SessionService {
 
   static Future<void> clear() async {
     await _storage.delete(key: _accessTokenKey);
+    await _storage.delete(key: _refreshTokenKey);
     await _storage.delete(key: _roleKey);
     await _storage.delete(key: _userIdKey);
     await _storage.delete(key: _fisherIdKey);

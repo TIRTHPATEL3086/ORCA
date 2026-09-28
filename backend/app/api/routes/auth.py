@@ -24,6 +24,7 @@ from app.schemas.auth import (
         LoginRequest,
         OTPRequestResponse,
         OTPVerifyResponse,
+        RefreshRequest,
         RegisterRequest,
         TokenResponse,
         UserResponse,
@@ -39,6 +40,12 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.api.dependencies import get_current_user
+from app.services.session_tokens import (
+    InvalidRefreshToken,
+    issue_refresh_token,
+    revoke_refresh_token,
+    rotate_refresh_token,
+)
 from app.services.sms_service import SmsDeliveryError, send_otp_sms, sends_real_sms
 
 router = APIRouter(
@@ -163,9 +170,12 @@ def login(
         user_id=user.id,
         role=user.role,
     )
+    refresh_token = issue_refresh_token(db, user)
+    db.commit()
 
     return TokenResponse(
         access_token=access_token,
+        refresh_token=refresh_token,
         token_type="bearer",
         user=user,
     )
@@ -177,6 +187,43 @@ def get_me(
     current_user: User = Depends(get_current_user),
 ):
     return current_user
+
+
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+)
+def refresh_session(
+    data: RefreshRequest,
+    db: Session = Depends(get_db),
+):
+    """Exchange a refresh token for a new access token and refresh token."""
+    try:
+        user, refresh_token = rotate_refresh_token(db, data.refresh_token)
+    except InvalidRefreshToken:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your session has ended. Please sign in again.",
+        )
+
+    return TokenResponse(
+        access_token=create_access_token(user_id=user.id, role=user.role),
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=user,
+    )
+
+
+@router.post(
+    "/logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def logout(
+    data: RefreshRequest,
+    db: Session = Depends(get_db),
+):
+    """Revoke this device's session on the server."""
+    revoke_refresh_token(db, data.refresh_token)
 @router.post(
     "/fisherman/request-otp",
     response_model=OTPRequestResponse,
@@ -374,14 +421,23 @@ def verify_fisherman_otp(
                 ),
             )
 
+        if not existing_user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This account is inactive.",
+            )
+
         access_token = create_access_token(
             user_id=existing_user.id,
             role=existing_user.role,
         )
+        refresh_token = issue_refresh_token(db, existing_user)
+        db.commit()
 
         return OTPVerifyResponse(
             is_new_user=False,
             access_token=access_token,
+            refresh_token=refresh_token,
             user=existing_user,
         )
 
@@ -480,9 +536,12 @@ def complete_fisherman_registration(
         user_id=user.id,
         role=user.role,
     )
+    refresh_token = issue_refresh_token(db, user)
+    db.commit()
 
     return TokenResponse(
         access_token=access_token,
+        refresh_token=refresh_token,
         token_type="bearer",
         user=user,
     )

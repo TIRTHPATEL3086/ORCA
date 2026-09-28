@@ -9,6 +9,7 @@ import '../core/api_config.dart';
 import '../models/fisherman_models.dart';
 import 'auth_service.dart';
 import 'session_service.dart';
+import 'api_client.dart';
 
 class FishermanService {
   FishermanService._();
@@ -55,7 +56,7 @@ class FishermanService {
 
   static Future<FishermanProfileData> getProfile() {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .get(Uri.parse('$_baseUrl/profile'), headers: await _headers())
           .timeout(ApiConfig.requestTimeout);
 
@@ -71,7 +72,7 @@ class FishermanService {
     String? emergencyContactPhone,
   }) {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .patch(
             Uri.parse('$_baseUrl/profile'),
             headers: await _headers(),
@@ -95,7 +96,7 @@ class FishermanService {
 
   static Future<List<VesselData>> getVessels() {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .get(Uri.parse('$_baseUrl/vessels'), headers: await _headers())
           .timeout(ApiConfig.requestTimeout);
 
@@ -125,7 +126,7 @@ class FishermanService {
     required int personsOnboardDefault,
   }) {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .post(
             Uri.parse('$_baseUrl/vessels'),
             headers: await _headers(),
@@ -156,7 +157,7 @@ class FishermanService {
     required int personsOnboardDefault,
   }) {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .patch(
             Uri.parse('$_baseUrl/vessels/$vesselId'),
             headers: await _headers(),
@@ -178,7 +179,7 @@ class FishermanService {
 
   static Future<void> deleteVessel(String vesselId) {
     return _network(() async {
-      final response = await http
+      final response = await ApiClient.instance
           .delete(
             Uri.parse('$_baseUrl/vessels/$vesselId'),
             headers: await _headers(),

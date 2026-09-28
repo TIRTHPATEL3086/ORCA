@@ -119,7 +119,11 @@ class _FishermanOtpScreenState extends State<FishermanOtpScreen> {
         return;
       }
 
-      await SessionService.saveSession(accessToken: accessToken, user: user);
+      await SessionService.saveSession(
+        accessToken: accessToken,
+        refreshToken: result.refreshToken,
+        user: user,
+      );
 
       if (!mounted) return;
 
@@ -133,7 +137,7 @@ class _FishermanOtpScreenState extends State<FishermanOtpScreen> {
       if (mounted) _message(error.message);
     } catch (_) {
       if (mounted) {
-        _message('Could not verify the OTP. Check the backend connection.');
+        _message('Could not verify the OTP. Check your internet connection and try again.');
       }
     } finally {
       if (mounted) setState(() => isLoading = false);

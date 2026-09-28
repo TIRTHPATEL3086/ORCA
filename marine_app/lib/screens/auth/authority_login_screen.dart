@@ -53,6 +53,7 @@ class _AuthorityLoginScreenState extends State<AuthorityLoginScreen> {
 
       await SessionService.saveSession(
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
         user: result.user,
       );
 

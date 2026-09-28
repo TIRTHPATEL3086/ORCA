@@ -53,6 +53,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
       await SessionService.saveSession(
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
         user: result.user,
       );
 

@@ -93,6 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       await SessionService.saveSession(
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
         user: result.user,
       );
 

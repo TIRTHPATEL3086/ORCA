@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../core/api_config.dart';
 
 import '../models/auth_models.dart';
+import 'session_service.dart';
 
 class ApiException implements Exception {
   final int statusCode;
@@ -123,6 +124,26 @@ class AuthService {
         .timeout(ApiConfig.requestTimeout);
 
     return AuthResult.fromJson(_decode(response));
+  }
+
+  /// Signs out on the server (revokes this device's session) and clears
+  /// the stored session. Local sign-out always completes, even offline.
+  static Future<void> logout() async {
+    final refreshToken = await SessionService.getRefreshToken();
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      try {
+        await http
+            .post(
+              Uri.parse('$_baseUrl/logout'),
+              headers: _headers,
+              body: jsonEncode({'refresh_token': refreshToken}),
+            )
+            .timeout(const Duration(seconds: 10));
+      } catch (_) {
+        // Offline: the session still ends on this device.
+      }
+    }
+    await SessionService.clear();
   }
 
   static Map<String, dynamic> _decode(http.Response response) {
