@@ -4,6 +4,9 @@ from app.agents.context_agent import (
 from app.agents.explanation_agent import (
     build_explanation,
 )
+from app.agents.fisherman_explanation_agent import (
+    build_fisherman_explanation,
+)
 from app.agents.language_agent import (
     detect_language,
     normalize_language,
@@ -42,18 +45,12 @@ def _actions_for_intent(
     ]
 
     if intent in {
+        "SEA_CONDITIONS",
+        "SAFETY",
         "ROUTE",
         "PFZ",
+        "HABITAT",
     }:
-        actions.insert(
-            0,
-            OrcaAgentAction(
-                id="open_plan_trip",
-                label="Plan Trip",
-            ),
-        )
-
-    if intent == "HABITAT":
         actions.insert(
             0,
             OrcaAgentAction(
@@ -128,18 +125,31 @@ def run_orca_agent(
         )
     )
 
-    (
-        decision,
-        safety_state,
-        short_answer,
-        layman_explanation,
-        recommendation,
-    ) = build_explanation(
-        intent,
-        response_language,
-        state,
-        audience_role=role,
-    )
+    if role == "FISHERMAN":
+        (
+            decision,
+            safety_state,
+            short_answer,
+            layman_explanation,
+            recommendation,
+        ) = build_fisherman_explanation(
+            intent,
+            response_language,
+            state,
+        )
+    else:
+        (
+            decision,
+            safety_state,
+            short_answer,
+            layman_explanation,
+            recommendation,
+        ) = build_explanation(
+            intent,
+            response_language,
+            state,
+            audience_role=role,
+        )
 
     return OrcaAgentQueryResponse(
         intent=intent,

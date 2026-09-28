@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/gis_models.dart';
 import '../../services/fisherman_service.dart';
 import '../../services/gis_service.dart';
+import '../../services/offline_readiness_service.dart';
 import 'mission_tracking_screen.dart';
 
 class PlanTripScreen extends StatefulWidget {
@@ -29,6 +30,8 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
 
   bool loading = true;
   bool calculating = false;
+  bool preparingOffline = false;
+  String offlineReadiness = 'Checking offline readiness...';
   String? error;
 
   @override
@@ -75,6 +78,10 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
 
     try {
       final loadedZones = await GisService.getZones();
+
+      await OfflineReadinessService.saveSafetyCacheBoundaries(
+        loadedZones,
+      );
       final position = await _tryPosition();
 
       try {
@@ -97,6 +104,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
 
       setState(() {
         zones = loadedZones;
+        offlineReadiness = 'Safety Cache Ready';
 
         if (position != null) {
           startPoint = LatLng(position.latitude, position.longitude);
@@ -202,6 +210,14 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         selectedRoute = initial;
       });
 
+      await _prepareOfflineMissionPack(
+        routePlan: result,
+        selected: initial,
+        start: start,
+        destination: end,
+        speed: speed,
+      );
+
       final points = initial.waypoints
           .map((w) => LatLng(w.latitude, w.longitude))
           .toList();
@@ -249,6 +265,40 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
     return route.waypoints.map((w) => LatLng(w.latitude, w.longitude)).toList();
   }
 
+  Future<void> _prepareOfflineMissionPack({
+    required RoutePlanData routePlan,
+    required RouteAlternativeData selected,
+    required LatLng start,
+    required LatLng destination,
+    required double speed,
+  }) async {
+    if (mounted) {
+      setState(() {
+        preparingOffline = true;
+        offlineReadiness = 'Preparing offline mission data...';
+      });
+    }
+
+    final saved = await OfflineReadinessService.saveMissionPack(
+      plan: routePlan,
+      selectedRoute: selected,
+      start: start,
+      destination: destination,
+      cruisingSpeedKnots: speed,
+      zones: zones,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      preparingOffline = false;
+      offlineReadiness = saved
+          ? 'Offline Ready • Mission Pack saved automatically'
+          : 'Safety Cache Ready • Mission Pack could not be saved';
+    });
+  }
+
+
   Future<void> _startMission() async {
     final route = selectedRoute;
     final speed = double.tryParse(speedController.text.trim());
@@ -256,6 +306,33 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
     if (route == null || speed == null || speed <= 0) {
       return;
     }
+
+    // Final selected route is persisted before navigation.
+    final routePlan = plan;
+    final start = startPoint;
+    final destination = endPoint;
+
+    if (routePlan != null && start != null && destination != null) {
+      await _prepareOfflineMissionPack(
+        routePlan: routePlan,
+        selected: route,
+        start: start,
+        destination: destination,
+        speed: speed,
+      );
+    }
+
+
+    if (routePlan != null && start != null && destination != null) {
+      await _prepareOfflineMissionPack(
+          routePlan: routePlan,
+          selected: route,
+          start: start,
+          destination: destination,
+          speed: speed,
+      );
+    }
+    if (!mounted) return;
 
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -281,6 +358,82 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
           : _content(),
     );
   }
+
+  Widget _offlineReadinessCard() {
+    final full = offlineReadiness.startsWith('Offline Ready');
+    final color = full ? AppTheme.success : AppTheme.oceanBlue;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: color.withValues(alpha: 0.22),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              full ? Icons.offline_pin_rounded : Icons.shield_outlined,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  full ? 'Offline Ready' : 'Always-Ready Safety Cache',
+                  style: const TextStyle(
+                    color: AppTheme.navy,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  offlineReadiness,
+                  style: const TextStyle(
+                    color: Color(0xFF637983),
+                    fontSize: 11.8,
+                    height: 1.3,
+                  ),
+                ),
+                if (!full)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 3),
+                    child: Text(
+                      'Plan a route and ORCA prepares the Mission Pack automatically — no separate download step.',
+                      style: TextStyle(
+                        color: Color(0xFF637983),
+                        fontSize: 11.2,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (preparingOffline)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _errorView() {
     return Center(
@@ -312,6 +465,8 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 30),
       children: [
+        _offlineReadinessCard(),
+        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(

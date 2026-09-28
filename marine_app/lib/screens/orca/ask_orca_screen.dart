@@ -903,7 +903,7 @@ final previous = List<OrcaChatMessageData>.from(messages);
 
       await OrcaChatHistoryService.save(messages);
 
-      await _speak(result.spokenText);
+      await _speak(_speechSummary(result));
 
     } catch (e) {
 
@@ -989,6 +989,16 @@ final previous = List<OrcaChatMessageData>.from(messages);
         }
       },
     );
+  }
+
+  String _speechSummary(OrcaAgentResponseData data) {
+    // Fisherman voice output is intentionally short.
+    // Evidence and agent details stay visible in the UI but are NOT read aloud.
+    return [
+      data.shortAnswer.trim(),
+      data.laymanExplanation.trim(),
+      data.recommendation.trim(),
+    ].where((part) => part.isNotEmpty).join('. ');
   }
 
   Future<void> _speak(String text) async {
@@ -1505,169 +1515,169 @@ final previous = List<OrcaChatMessageData>.from(messages);
 
 
   Widget _structured(OrcaAgentResponseData data) {
+    final isPositive =
+        data.decision == 'PROCEED' ||
+        data.decision == 'ROUTES_READY' ||
+        data.decision == 'PROCEED_TO_COMPARE';
+
+    final isStop =
+        data.decision == 'DO_NOT_PROCEED' ||
+        data.decision == 'DO_NOT_DEPART';
+
+    final decisionColor = isPositive
+        ? AppTheme.success
+        : isStop
+            ? AppTheme.danger
+            : AppTheme.warning;
 
     return Container(
-
       padding: const EdgeInsets.all(17),
-
       decoration: BoxDecoration(
-
         color: Colors.white,
-
         borderRadius: BorderRadius.circular(22),
-
         border: Border.all(color: const Color(0xFFE0E9ED)),
-
       ),
-
       child: Column(
-
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: decisionColor.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(
+                color: decisionColor.withValues(alpha: 0.30),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  isPositive
+                      ? Icons.check_circle_rounded
+                      : isStop
+                          ? Icons.cancel_rounded
+                          : Icons.warning_amber_rounded,
+                  color: decisionColor,
+                  size: 30,
+                ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tr('decision'),
+                        style: TextStyle(
+                          color: decisionColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        data.shortAnswer,
+                        style: const TextStyle(
+                          color: AppTheme.navy,
+                          fontSize: 18,
+                          height: 1.25,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-          _section(tr('decision'), data.shortAnswer),
-
+          const SizedBox(height: 15),
           _section(tr('why'), data.laymanExplanation),
-
           _section(tr('action'), data.recommendation),
 
-          const Divider(height: 24),
-
-          Text(
-
-            tr('tools'),
-
-            style: const TextStyle(
-
-              color: AppTheme.navy,
-
-              fontWeight: FontWeight.w900,
-
-            ),
-
-          ),
-
-          const SizedBox(height: 7),
-
-          Wrap(
-
-            spacing: 7,
-
-            runSpacing: 7,
-
-            children: data.executedTools
-
-                .map((tool) => Chip(label: Text(tool)))
-
-                .toList(),
-
-          ),
-
-          if (data.evidence.isNotEmpty) ...[
-
-            const SizedBox(height: 12),
-
-            Text(
-
-              tr('evidence'),
-
-              style: const TextStyle(
-
-                color: AppTheme.navy,
-
-                fontWeight: FontWeight.w900,
-
-              ),
-
-            ),
-
-            const SizedBox(height: 6),
-
-            ...data.evidence.map(
-
-              (e) => Padding(
-
-                padding: const EdgeInsets.only(bottom: 6),
-
-                child: Text(
-
-                  '${e.label}: ${e.value} • ${e.source}',
-
-                  style: const TextStyle(
-
-                    color: Color(0xFF667A82),
-
-                    fontSize: 11.5,
-
+          if (data.actions.isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: data.actions.map(
+                (a) => FilledButton.icon(
+                  onPressed: () => _openAction(a),
+                  icon: Icon(
+                    a.id == 'open_plan_trip'
+                        ? Icons.route_rounded
+                        : a.id == 'open_boundary'
+                            ? Icons.shield_outlined
+                            : Icons.water_rounded,
                   ),
-
+                  label: Text(a.label),
                 ),
-
-              ),
-
+              ).toList(),
             ),
-
           ],
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          Row(
-
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            childrenPadding: const EdgeInsets.only(bottom: 4),
+            title: Text(
+              tr('evidence'),
+              style: const TextStyle(
+                color: AppTheme.navy,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            subtitle: const Text(
+              'Sources, live values and agents used',
+              style: TextStyle(fontSize: 11.5),
+            ),
             children: [
-
-              OutlinedButton.icon(
-
-                onPressed: () => _speak(data.spokenText),
-
-                icon: const Icon(Icons.volume_up_rounded),
-
-                label: Text(tr('speak')),
-
-              ),
-
-              const SizedBox(width: 8),
-
-              Expanded(
-
-                child: Wrap(
-
-                  spacing: 6,
-
-                  runSpacing: 6,
-
-                  children: data.actions
-
-                      .map(
-
-                        (a) => TextButton(
-
-                          onPressed: () => _openAction(a),
-
-                          child: Text(a.label),
-
-                        ),
-
-                      )
-
-                      .toList(),
-
+              if (data.executedTools.isNotEmpty) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: 7,
+                    runSpacing: 7,
+                    children: data.executedTools
+                        .map((tool) => Chip(label: Text(tool)))
+                        .toList(),
+                  ),
                 ),
-
+                const SizedBox(height: 8),
+              ],
+              ...data.evidence.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 7),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${e.label}: ${e.value} • ${e.source}',
+                      style: const TextStyle(
+                        color: Color(0xFF667A82),
+                        fontSize: 11.5,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-
             ],
-
           ),
 
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => _speak(_speechSummary(data)),
+              icon: const Icon(Icons.volume_up_rounded),
+              label: Text(tr('speak')),
+            ),
+          ),
         ],
-
       ),
-
     );
-
   }
-
 
 
   Widget _section(String title, String body) {
