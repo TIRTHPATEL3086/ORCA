@@ -1,9 +1,14 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.marine import MarineConditionsResponse
 from app.services.marine_service import fetch_marine_conditions
+
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(
@@ -35,6 +40,7 @@ def get_conditions(
             longitude,
         )
     except Exception as exc:
+        logger.exception("Live marine data fetch failed")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=(
