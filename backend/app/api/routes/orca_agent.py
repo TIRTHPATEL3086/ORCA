@@ -1,12 +1,18 @@
-from fastapi import APIRouter, Depends
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.dependencies import get_current_user
+from app.core.upstream import describe_upstream_error
 from app.models.user import User
 from app.schemas.orca_agent import (
     OrcaAgentQueryRequest,
     OrcaAgentQueryResponse,
 )
 from app.services.orca_agent_service import run_orca_agent
+
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(
@@ -44,9 +50,19 @@ def query_orca(
     data: OrcaAgentQueryRequest,
     current_user: User = Depends(get_current_user),
 ):
-    return run_orca_agent(
-        data,
-        audience_role=_user_role_code(
-            current_user
-        ),
-    )
+    try:
+        return run_orca_agent(
+            data,
+            audience_role=_user_role_code(
+                current_user
+            ),
+        )
+    except Exception as exc:
+        logger.exception("ORCA agent query failed")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "ORCA could not complete this answer right now. "
+                f"Please try again shortly. ({describe_upstream_error(exc)})"
+            ),
+        ) from exc

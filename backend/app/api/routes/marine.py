@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.dependencies import get_current_user
+from app.core.upstream import describe_upstream_error
 from app.models.user import User
 from app.schemas.marine import MarineConditionsResponse
 from app.services.marine_service import fetch_marine_conditions
@@ -45,6 +46,7 @@ def get_conditions(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=(
                 "Live marine data is temporarily unavailable. "
-                "Retry shortly or use the last downloaded Mission Pack."
+                "Retry shortly or use the last downloaded Mission Pack. "
+                f"({describe_upstream_error(exc)})"
             ),
         ) from exc
