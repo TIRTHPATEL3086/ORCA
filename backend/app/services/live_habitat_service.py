@@ -19,6 +19,7 @@ from app.schemas.habitat import (
     RuntimeEvidence,
 )
 from app.services.habitat_model_service import score_habitat
+from app.services.weather_sources import current_wind
 
 
 ORCA_ROOT = Path(__file__).resolve().parents[3]
@@ -39,10 +40,6 @@ NOAA_OISST_NRT = (
 NOAA_VIIRS_CHL_NRT = (
     "https://coastwatch.pfeg.noaa.gov/erddap/griddap/"
     "nesdisVHNchlaDaily.csv"
-)
-
-OPEN_METEO = (
-    "https://api.open-meteo.com/v1/forecast"
 )
 
 HTTP_TIMEOUT = 45
@@ -515,49 +512,12 @@ def _fetch_current_wind(
     longitude: float,
     now: datetime,
 ):
-    response = requests.get(
-        OPEN_METEO,
-        params={
-            "latitude": latitude,
-            "longitude": longitude,
-            "current": (
-                "wind_speed_10m,"
-                "wind_direction_10m"
-            ),
-            "wind_speed_unit": "ms",
-            "timezone": "UTC",
-        },
-        timeout=HTTP_TIMEOUT,
-        headers={
-            "User-Agent": (
-                "ORCA-Hackathon-Marine-Intelligence/1.0"
-            )
-        },
-    )
-    response.raise_for_status()
+    # Open-Meteo with MET Norway fallback (shared-IP rate limits on hosts).
+    wind = current_wind(latitude, longitude)
 
-    payload = response.json()
-    current = payload.get(
-        "current",
-        {},
-    )
-
-    speed = _float_or_none(
-        current.get(
-            "wind_speed_10m"
-        )
-    )
-    direction = _float_or_none(
-        current.get(
-            "wind_direction_10m"
-        )
-    )
-
-    observed = _parse_iso(
-        current.get(
-            "time"
-        )
-    )
+    speed = wind.speed_ms
+    direction = wind.direction_deg
+    observed = _parse_iso(wind.model_time)
 
     # Meteorological direction is where wind comes FROM.
     # Convert to eastward/northward vector toward which air moves.
@@ -589,7 +549,7 @@ def _fetch_current_wind(
             variable="wind_speed",
             value=speed,
             unit="m/s",
-            source="Open-Meteo Weather API",
+            source=wind.source,
             observed_at=(
                 observed.isoformat()
                 if observed

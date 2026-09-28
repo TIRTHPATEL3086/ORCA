@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import heapq
 import json
 import math
@@ -8,6 +9,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from app.services import land_mask
+from app.services.weather_sources import current_wind, get_json
 
 from app.schemas.gis import (
     BoundaryCheckResponse,
@@ -773,19 +775,6 @@ def check_boundary(
 
 
 
-def _request_json(base_url: str, params: dict) -> object:
-    url = f"{base_url}?{urlencode(params)}"
-    req = Request(
-        url,
-        headers={
-            "User-Agent": "ORCA-Hackathon/1.0",
-            "Accept": "application/json",
-        },
-    )
-    with urlopen(req, timeout=15) as response:
-        return json.loads(response.read().decode("utf-8"))
-
-
 def _chunks(items: list, size: int):
     for i in range(0, len(items), size):
         yield items[i:i + size]
@@ -802,6 +791,25 @@ def _num(data: dict, key: str) -> float | None:
 
 
 
+
+def _fallback_weather(batch: list[tuple[float, float]]) -> list[dict]:
+    def one(point: tuple[float, float]) -> dict:
+        try:
+            wind = current_wind(*point)
+        except Exception:
+            return {}
+        return {
+            "current": {
+                "wind_speed_10m": wind.speed_ms,
+                "wind_direction_10m": wind.direction_deg,
+                "wind_gusts_10m": wind.gust_ms,
+            }
+        }
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        return list(pool.map(one, batch))
+
+
 def _fetch_conditions_batch(
     points: list[tuple[float, float]],
 ) -> list[RouteCondition]:
@@ -811,7 +819,7 @@ def _fetch_conditions_batch(
         lats = ",".join(f"{lat:.6f}" for lat, _ in batch)
         lons = ",".join(f"{lon:.6f}" for _, lon in batch)
 
-        marine = _request_json(
+        marine = get_json(
             MARINE_ENDPOINT,
             {
                 "latitude": lats,
@@ -825,18 +833,23 @@ def _fetch_conditions_batch(
             },
         )
 
-        weather = _request_json(
-            WEATHER_ENDPOINT,
-            {
-                "latitude": lats,
-                "longitude": lons,
-                "current": (
-                    "wind_speed_10m,wind_direction_10m,wind_gusts_10m"
-                ),
-                "wind_speed_unit": "ms",
-                "cell_selection": "sea",
-            },
-        )
+        try:
+            weather = get_json(
+                WEATHER_ENDPOINT,
+                {
+                    "latitude": lats,
+                    "longitude": lons,
+                    "current": (
+                        "wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+                    ),
+                    "wind_speed_unit": "ms",
+                    "cell_selection": "sea",
+                },
+            )
+        except Exception:
+            # Batch source unavailable (e.g. shared-IP rate limit):
+            # fetch wind point by point with fallback sources.
+            weather = _fallback_weather(batch)
 
         marine_list = marine if isinstance(marine, list) else [marine]
         weather_list = weather if isinstance(weather, list) else [weather]

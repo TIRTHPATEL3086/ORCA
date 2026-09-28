@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 
+from app.services.weather_sources import current_wind, get_json
 from app.schemas.marine import (
     MarineConditionsResponse,
     MarineEvidence,
@@ -17,24 +15,6 @@ WEATHER_ENDPOINT = "https://api.open-meteo.com/v1/forecast"
 INCOIS_OSF_URL = (
     "https://www.incois.gov.in/oceanservices/osfforecast.jsp"
 )
-
-
-def _get_json(
-    base_url: str,
-    params: dict[str, str | float],
-) -> dict:
-    url = f"{base_url}?{urlencode(params)}"
-
-    request = Request(
-        url,
-        headers={
-            "User-Agent": "ORCA-Hackathon/1.0",
-            "Accept": "application/json",
-        },
-    )
-
-    with urlopen(request, timeout=12) as response:
-        return json.loads(response.read().decode("utf-8"))
 
 
 def _number(
@@ -119,42 +99,25 @@ def fetch_marine_conditions(
         "cell_selection": "sea",
     }
 
-    weather_params = {
-        "latitude": latitude,
-        "longitude": longitude,
-        "current": (
-            "wind_speed_10m,wind_direction_10m,wind_gusts_10m"
-        ),
-        "wind_speed_unit": "ms",
-        "timezone": "auto",
-        "cell_selection": "sea",
-    }
-
-    marine = _get_json(
+    marine = get_json(
         MARINE_ENDPOINT,
         marine_params,
     )
 
-    weather = _get_json(
-        WEATHER_ENDPOINT,
-        weather_params,
-    )
+    try:
+        wind = current_wind(latitude, longitude)
+    except Exception:
+        # Waves alone still support a screening; wind shows as unavailable.
+        wind = None
 
     marine_current = marine.get("current") or {}
-    weather_current = weather.get("current") or {}
 
     wave_height = _number(
         marine_current,
         "wave_height",
     )
-    wind_speed = _number(
-        weather_current,
-        "wind_speed_10m",
-    )
-    wind_gust = _number(
-        weather_current,
-        "wind_gusts_10m",
-    )
+    wind_speed = wind.speed_ms if wind else None
+    wind_gust = wind.gust_ms if wind else None
 
     screening_status, screening_reason = (
         _prototype_screening(
@@ -182,12 +145,19 @@ def fetch_marine_conditions(
             ),
         ),
         MarineEvidence(
-            source="Open-Meteo Weather API",
-            source_url=WEATHER_ENDPOINT,
-            model_time=weather_current.get("time"),
+            source=wind.source if wind else "Wind data",
+            source_url=wind.source_url if wind else WEATHER_ENDPOINT,
+            model_time=wind.model_time if wind else None,
             fetched_at=fetched_at,
-            freshness_label="Current model conditions",
-            note="Development adapter for 10 m wind and gust.",
+            freshness_label=(
+                "Current model conditions" if wind else "Temporarily unavailable"
+            ),
+            note=(
+                "10 m wind and gust (gust may be unavailable outside "
+                "the source's coverage)."
+                if wind
+                else "Wind sources did not respond; screening used waves only."
+            ),
         ),
         MarineEvidence(
             source="INCOIS Ocean State Forecast (official India reference)",
@@ -243,10 +213,7 @@ def fetch_marine_conditions(
             "sea_level_height_msl",
         ),
         wind_speed_ms=wind_speed,
-        wind_direction_deg=_number(
-            weather_current,
-            "wind_direction_10m",
-        ),
+        wind_direction_deg=wind.direction_deg if wind else None,
         wind_gust_ms=wind_gust,
         screening_status=screening_status,
         screening_reason=screening_reason,
