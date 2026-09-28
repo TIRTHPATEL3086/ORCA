@@ -56,7 +56,7 @@ class _FishermanPhoneAuthScreenState extends State<FishermanPhoneAuthScreen> {
     } catch (_) {
       if (mounted) {
         _message(
-          'Could not connect to ORCA. Check the backend and ADB reverse.',
+          'Could not reach ORCA. Check your internet connection and try again.',
         );
       }
     } finally {

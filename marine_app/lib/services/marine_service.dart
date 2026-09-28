@@ -70,7 +70,7 @@ class MarineService {
       throw const ApiException(
         statusCode: 0,
         message:
-            'ORCA backend is not reachable. Check FastAPI and ADB reverse.',
+            'Could not reach ORCA. Check your internet connection and try again.',
       );
     } on http.ClientException {
       throw const ApiException(

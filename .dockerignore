@@ -1,0 +1,11 @@
+# Keep the backend image small and free of secrets.
+.git
+**/__pycache__
+**/*.pyc
+**/.venv
+**/.pytest_cache
+backend/.env
+marine_app/
+data/
+ml/phase12/
+*.bak

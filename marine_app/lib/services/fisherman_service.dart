@@ -38,17 +38,17 @@ class FishermanService {
     } on SocketException {
       throw const ApiException(
         statusCode: 0,
-        message: 'ORCA backend is not reachable. Start FastAPI and reconnect ADB reverse on port 8000.',
+        message: 'Could not reach ORCA. Check your internet connection and try again.',
       );
     } on http.ClientException {
       throw const ApiException(
         statusCode: 0,
-        message: 'ORCA backend is not reachable. Check the USB connection and ADB reverse.',
+        message: 'Could not reach ORCA. Check your internet connection and try again.',
       );
     } on TimeoutException {
       throw const ApiException(
         statusCode: 0,
-        message: 'ORCA backend took too long to respond. Check FastAPI and the device connection.',
+        message: 'ORCA took too long to respond. Please try again.',
       );
     }
   }

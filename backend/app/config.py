@@ -8,12 +8,14 @@ ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 
 class Settings(BaseSettings):
-    # Database
-    db_host: str
-    db_port: int
-    db_name: str
-    db_user: str
-    db_password: str
+    # Database: either a single DATABASE_URL (as provided by cloud hosts)
+    # or the individual DB_* values used for local development.
+    database_url: str | None = None
+    db_host: str = "127.0.0.1"
+    db_port: int = 5432
+    db_name: str = "orca_db"
+    db_user: str = "orca_app"
+    db_password: str = ""
 
     # Authentication
     jwt_secret_key: str
