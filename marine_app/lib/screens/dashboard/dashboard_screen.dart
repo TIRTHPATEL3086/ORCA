@@ -726,15 +726,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _quickGrid(BuildContext context, List<_QuickAction> actions) {
+    // Tile height follows the text scale so two-line titles always fit.
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: actions.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 1.25,
+        mainAxisExtent: 96 + 36 * textScale,
       ),
       itemBuilder: (context, index) {
         final action = actions[index];
@@ -783,6 +786,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const Spacer(),
                   Text(
                     action.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppTheme.ink,
                       fontWeight: FontWeight.w700,

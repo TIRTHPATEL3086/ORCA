@@ -226,6 +226,19 @@ Future<void> _expectNoOverflow(
     for (var i = 0; i < 6; i++) {
       await tester.pump(const Duration(milliseconds: 300));
     }
+
+    // Scroll through the main vertical list so content below the fold is
+    // laid out and checked too.
+    final scrollables = find.byWidgetPredicate(
+      (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+    );
+    if (scrollables.evaluate().isNotEmpty) {
+      final main = scrollables.first;
+      for (var i = 0; i < 25; i++) {
+        await tester.drag(main, const Offset(0, -400), warnIfMissed: false);
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+    }
   } finally {
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 40));

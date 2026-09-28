@@ -23,7 +23,7 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text("Let's start"), findsOneWidget);
+    expect(find.text('Get started'), findsWidgets);
     expect(find.text('How ORCA works'), findsOneWidget);
   });
 }
