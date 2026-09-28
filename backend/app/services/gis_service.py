@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from global_land_mask import globe
+from app.services import land_mask
 
 from app.schemas.gis import (
     BoundaryCheckResponse,
@@ -80,7 +80,7 @@ def list_zones() -> list[BoundaryZone]:
 
 
 def surface_type(latitude: float, longitude: float) -> str:
-    return "WATER" if bool(globe.is_ocean(latitude, longitude)) else "LAND"
+    return "WATER" if bool(land_mask.is_ocean(latitude, longitude)) else "LAND"
 
 
 def _rad(value: float) -> float:
@@ -269,7 +269,7 @@ def _distance_to_coastline_km(
                 ring,
             )
 
-            if not bool(globe.is_ocean(lat2, lon2)):
+            if not bool(land_mask.is_ocean(lat2, lon2)):
                 land_bearings.append(float(bearing))
 
         if land_bearings:
@@ -288,7 +288,7 @@ def _distance_to_coastline_km(
                         mid,
                     )
 
-                    if bool(globe.is_ocean(lat2, lon2)):
+                    if bool(land_mask.is_ocean(lat2, lon2)):
                         low = mid
                     else:
                         high = mid
